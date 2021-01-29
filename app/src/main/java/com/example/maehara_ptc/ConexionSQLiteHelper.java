@@ -27,6 +27,7 @@ public class ConexionSQLiteHelper extends SQLiteOpenHelper {
         db.execSQL("CREATE TABLE empacadoras (id INTEGER PRIMARY KEY, clasificadora TEXT,empacadora INTEGER, tipo_huevo TEXT)");
         db.execSQL("CREATE TABLE motivo_retencion (id INTEGER PRIMARY KEY,descripcion TEXT,tipo TEXT)");
         db.execSQL("CREATE TABLE lotes_sql (cod_interno INTEGER,tipo_huevo INTEGER,cod_carrito INTEGER,cod_lote TEXT,cantidad INTEGER,fecha_puesta TEXT,estado_liberacion TEXT,clasificadora TEXT)");
+        db.execSQL("CREATE TABLE estados_registros (id INTEGER PRIMARY KEY,descripcion TEXT)");
 
         db.execSQL("CREATE TABLE lotes (cod_interno INTEGER PRIMARY KEY AUTOINCREMENT, fecha TEXT NOT NULL,fecha_puesta TEXT NOT NULL,cod_carrito  INTEGER NOT NULL,tipo_huevo TEXT NOT NULL,cod_clasificacion TEXT NOT NULL,hora_clasificacion TEXT NOT NULL," +
                 "cod_lote TEXT NOT NULL,resp_clasificacion TEXT NOT NULL,resp_control_calidad TEXT NOT NULL,usuario_upd TEXT NOT NULL,u_medida TEXT NOT NULL,cantidad INTEGER NOT NULL," +
@@ -43,6 +44,7 @@ public class ConexionSQLiteHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS motivo_retencion");
         db.execSQL("DROP TABLE IF EXISTS lotes_sql");
         db.execSQL("DROP TABLE IF EXISTS lotes");
+        db.execSQL("DROP TABLE IF EXISTS estados_registros");
          onCreate(db);
     }
 

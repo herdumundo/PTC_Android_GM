@@ -14,8 +14,8 @@ public class contenedores_arrays {
     public static ArrayList<String> u_medida = new ArrayList<>();
     public static ArrayList<String> horas = new ArrayList<>();
     public static ArrayList<String> tipos_aviarios = new ArrayList<>();
-    public static ArrayList<String> tipos_almacenamientos = new ArrayList<>();
     public static ArrayList<String> empacadoras = new ArrayList<>();
+    public static ArrayList<String> cantidades = new ArrayList<>();
 
     public static void cargar_tipos_maples(Activity activity) {
         tipo_maples.clear();
@@ -42,14 +42,24 @@ public class contenedores_arrays {
         empacadoras.add("11");
         registro_liberados.cbox_empacadora.setItems(empacadoras);
     }
-    public static void cargar_tipos_almacenamientos(Activity activity) {
-        tipos_almacenamientos.clear();
-        tipos_almacenamientos.add("C");
-        tipos_almacenamientos.add("P");
-        tipos_almacenamientos.add("M");
-        registro_liberados.spinner_tipo_almacenamiento = new SpinnerDialog(activity,tipos_almacenamientos,"SELECCION DE TIPO DE ALMACENAMIENTO");
 
+    public static void cargar_cantidades(Activity activity) {
+        cantidades.clear();
+        cantidades.add("1");
+        cantidades.add("2");
+        cantidades.add("3");
+        cantidades.add("4");
+        cantidades.add("5");
+        cantidades.add("6");
+        cantidades.add("7");
+        cantidades.add("8");
+        cantidades.add("9");
+        cantidades.add("10");
+        cantidades.add("11");
+        cantidades.add("12");
+        registro_liberados.spinner_cantidades = new SpinnerDialog(activity,cantidades,"SELECCIONE CANTIDAD DE CAJONES");
     }
+
     public static void cargar_tipos_aviarios(Activity activity) {
         tipos_aviarios.clear();
         tipos_aviarios.add("M");

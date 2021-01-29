@@ -19,6 +19,8 @@ import android.widget.ToggleButton;
 
 import com.tapadoo.alerter.Alerter;
 
+import java.sql.Date;
+
 import Utilidades.contenedor_usuario;
 import Utilidades.contenedores_arrays;
 import Utilidades.voids;
@@ -29,79 +31,61 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 public class registro_liberados extends AppCompatActivity {
-
-    public static  SpinnerDialog  spinner_tipo_maples,spinner_tipo_huevo,spinner_u_medida,spinner_hora_inicio,
-            spinner_hora_fin,spinner_tipo_aviario,spinner_tipo_almacenamiento;
     private static final int CODIGO_PERMISOS_CAMARA = 1, CODIGO_INTENT = 2;
     private boolean permisoCamaraConcedido = false, permisoSolicitadoDesdeBoton = false;
-    public static TextView txt_fecha_clasificacion,txt_fecha_puesta,txt_tipo_maples,txt_tipo_huevo,
-            txt_u_medida,txt_carro,txt_hora_inicio,txt_hora_fin,txt_tipo_aviario,txt_tipo_almacenamiento,
-            txt_responsable, txt_cantidad,txt_liberado_por,txt_comentario;
-    Button btn_fecha_puesta,btn_fecha_clasificacion;
+    public static SpinnerDialog spinner_tipo_maples,    spinner_tipo_huevo,     spinner_u_medida,
+                                spinner_hora_inicio,    spinner_hora_fin,       spinner_tipo_aviario,spinner_cantidades;
+    public static TextView  txt_fecha_clasificacion,txt_fecha_puesta,           txt_tipo_maples,    txt_tipo_huevo,
+                            txt_u_medida,           txt_carro,                  txt_hora_inicio,    txt_hora_fin,
+                            txt_tipo_aviario,       txt_responsable,            txt_cantidad,       txt_liberado_por,
+                            txt_comentario;
+    Button btn_fecha_puesta,btn_fecha_clasificacion,btnEscanear ;
     public static DatePickerDialog picker;
     public static MultipleSelectionSpinner cbox_empacadora;
     String codigo_borroso="NO";
     String codigo_especial="NO";
+    public static String fecha_registro="";
     ToggleButton toggle_codigo_borroso,toggle_codigo_especial;
-    //ConexionSQLiteHelper conn;
 
     public void onBackPressed()  {
-        new AlertDialog.Builder(this)
-                .setIcon(android.R.drawable.ic_dialog_alert)
-                .setTitle("ATENCION!!!.")
-                .setMessage("DESEA SALIR DEL REGISTRO PTC?.")
-                .setPositiveButton("SI", new DialogInterface.OnClickListener()
-                {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        Intent intent = new Intent(getApplicationContext(), menu_principal.class);
-                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                        finish();
-                        startActivity(intent);
-                    }
-
-                })
-                .setNegativeButton("NO", null)
-                .show();
+        voids.volver_atras(this,this,menu_principal.class,"DESEA IR AL MENU PRINCIPAL?",1);
     }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.scroll_liberados);
-        Button btnEscanear = findViewById(R.id.btnEscanear);
+
+        getSupportActionBar().setTitle("REGISTRO DE LIBERADOS");
+        getSupportActionBar().setSubtitle("AREA: "+ contenedor_usuario.area);
+
+
+        txt_carro               =   findViewById(R.id.txt_carro);
+        txt_fecha_clasificacion =   findViewById(R.id.txt_fecha_clasificacion);
+        txt_tipo_maples         =   findViewById(R.id.txt_tipo_maples);
+        txt_fecha_puesta        =   findViewById(R.id.txt_fecha_puesta);
+        txt_tipo_huevo          =   findViewById(R.id.txt_tipo_huevo);
+        txt_u_medida            =   findViewById(R.id.txt_u_medida);
+        txt_hora_inicio         =   findViewById(R.id.txt_hora_inicio);
+        txt_hora_fin            =   findViewById(R.id.txt_hora_fin);
+        txt_responsable         =   findViewById(R.id.txt_responsable);
+        txt_liberado_por        =   findViewById(R.id.txt_liberado_por);
+        txt_cantidad            =   findViewById(R.id.txt_cantidad);
+        txt_comentario          =   findViewById(R.id.txt_comentario);
+        txt_tipo_aviario        =   findViewById(R.id.txt_tipo_aviario);
+        btn_fecha_clasificacion =   findViewById(R.id.btn_fecha_clasificacion);
+        btn_fecha_puesta        =   findViewById(R.id.btn_fecha_puesta);
+        btnEscanear             =   findViewById(R.id.btnEscanear);
+        toggle_codigo_borroso   =   findViewById(R.id.codigo_borroso);
+        toggle_codigo_especial  =   findViewById(R.id.codigo_especial);
+        cbox_empacadora         = (MultipleSelectionSpinner)  findViewById(R.id.cbox_empacadora);
+        voids.conexion_sqlite(this);
         contenedores_arrays.cargar_tipos_maples( this);
         contenedores_arrays.cargar_tipos_huevos(this);
         contenedores_arrays.cargar_horas(this);
-          getSupportActionBar().setTitle("REGISTRO DE LIBERADOS");
-        getSupportActionBar().setSubtitle("AREA: "+ contenedor_usuario.area);
-        txt_carro = findViewById(R.id.txt_carro);
-        txt_fecha_clasificacion= (TextView)findViewById(R.id.txt_fecha_clasificacion);
-        txt_tipo_maples= (TextView)findViewById(R.id.txt_tipo_maples);
-        txt_fecha_puesta= (TextView)findViewById(R.id.txt_fecha_puesta);
-        txt_tipo_huevo= (TextView)findViewById(R.id.txt_tipo_huevo);
-        txt_u_medida= (TextView)findViewById(R.id.txt_u_medida);
-        txt_hora_inicio= (TextView)findViewById(R.id.txt_hora_inicio);
-        txt_hora_fin= (TextView)findViewById(R.id.txt_hora_fin);
-        btn_fecha_puesta= (Button) findViewById(R.id.btn_fecha_puesta);
-        txt_tipo_aviario= (TextView)findViewById(R.id.txt_tipo_aviario);
-        btn_fecha_clasificacion= (Button) findViewById(R.id.btn_fecha_clasificacion);
-        txt_tipo_almacenamiento= (TextView)findViewById(R.id.txt_tipo_almacenamiento);
-        txt_responsable= (TextView)findViewById(R.id.txt_responsable);
-        txt_liberado_por= (TextView)findViewById(R.id.txt_liberado_por);
-        txt_cantidad= (TextView)findViewById(R.id.txt_cantidad);
-        txt_comentario= (TextView)findViewById(R.id.txt_comentario);
-        cbox_empacadora= (MultipleSelectionSpinner)findViewById(R.id.cbox_empacadora);
-        toggle_codigo_borroso=(ToggleButton)findViewById(R.id.codigo_borroso);
-        toggle_codigo_especial=(ToggleButton)findViewById(R.id.codigo_especial);
-
         contenedores_arrays.cargar_tipos_aviarios(this);
-        contenedores_arrays.cargar_tipos_almacenamientos(this);
         contenedores_arrays.cargar_empacadoras();
-        voids.conexion_sqlite(this);
-
-
         verificarYPedirPermisosDeCamara();
-       // conn=new ConexionSQLiteHelper(getApplicationContext(),"BD_SQLITE_GM",null,1);
+        voids.set_fechas();
 
         btnEscanear.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -127,7 +111,6 @@ public class registro_liberados extends AppCompatActivity {
                 }
             }
         });
-
         toggle_codigo_especial.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -143,80 +126,97 @@ public class registro_liberados extends AppCompatActivity {
         txt_tipo_maples.setOnClickListener(new View.OnClickListener() {  @Override
         public void onClick(View v) {
             spinner_tipo_maples.showSpinerDialog();
+            spinner_tipo_maples.closeTitle="CERRAR";
+
         } } );
+
         spinner_tipo_maples.bindOnSpinerListener(new OnSpinerItemClick() {
             @Override
             public void onClick(String s, int i) {
                 txt_tipo_maples.setText(contenedores_arrays.tipo_maples.get(i));
             }
         });
-        txt_hora_inicio.setOnClickListener(new View.OnClickListener() {  @Override
-        public void onClick(View v) {
-            spinner_hora_inicio.showSpinerDialog();
-        } } );
+
+
+
         txt_hora_fin.setOnClickListener(new View.OnClickListener() {  @Override
         public void onClick(View v) {
             spinner_hora_fin.showSpinerDialog();
+            spinner_hora_fin.closeTitle="CERRAR";
+
         } } );
 
-        spinner_hora_inicio.bindOnSpinerListener(new OnSpinerItemClick() {
+        txt_tipo_aviario.setOnClickListener(new View.OnClickListener() {  @Override
+        public void onClick(View v) {
+            spinner_tipo_aviario.dTitle="SELECCIONAR TIPO DE AVIARIO";
+            spinner_tipo_aviario.closeTitle="CERRAR";
+            spinner_tipo_aviario.showSpinerDialog();
+        } } );
+        spinner_tipo_aviario.bindOnSpinerListener(new OnSpinerItemClick() {
             @Override
             public void onClick(String s, int i) {
-                txt_hora_inicio.setText(contenedores_arrays.horas.get(i));
-
-                spinner_hora_fin.bindOnSpinerListener(new OnSpinerItemClick() {
-                    @Override
-                    public void onClick(String s, int i) {
-                        txt_hora_fin.setText(contenedores_arrays.horas.get(i));
-
-                        spinner_tipo_aviario.bindOnSpinerListener(new OnSpinerItemClick() {
-                            @Override
-                            public void onClick(String s, int i) {
-                                txt_tipo_aviario.setText(contenedores_arrays.tipos_aviarios.get(i));
-                                spinner_tipo_almacenamiento.bindOnSpinerListener(new OnSpinerItemClick() {
-                                    @Override
-                                    public void onClick(String s, int i) {
-                                        txt_tipo_almacenamiento.setText(contenedores_arrays.tipos_almacenamientos.get(i));
-                                        txt_responsable.requestFocus();
-                                    }
-                                });
-                                spinner_tipo_almacenamiento.dTitle="SELECCIONAR TIPO DE ALMACENAMIENTO";
-                                spinner_tipo_almacenamiento.showSpinerDialog();
-
-                            }
-                        });
-                        spinner_tipo_aviario.dTitle="SELECCIONAR TIPO DE AVIARIO";
-                        spinner_tipo_aviario.showSpinerDialog();
-
-
-                    }
-                });
-                spinner_hora_fin.dTitle="SELECCIONAR HORA FINAL";
-                spinner_hora_fin.showSpinerDialog();
+                txt_tipo_aviario.setText(contenedores_arrays.tipos_aviarios.get(i));
             }
         });
-
         spinner_tipo_huevo.bindOnSpinerListener(new OnSpinerItemClick() {
             @Override
             public void onClick(String s, int i) {
                 txt_tipo_huevo.setText(contenedores_arrays.tipos_huevos.get(i));
 
                 contenedores_arrays.cargar_unidad_medida(contenedores_arrays.tipos_huevos.get(i).toString(), registro_liberados.this);
+
+                txt_u_medida.setOnClickListener(new View.OnClickListener() {  @Override
+                public void onClick(View v) { // ESTA OPCION SE DA ACTIVA, EN EL CASO DE QUE SE QUIERA SELECCIONAR SOLAMENTE ESE COMBOBOX
+                    spinner_u_medida.dTitle="SELECCIONAR UNIDAD DE MEDIDA";
+                    spinner_u_medida.closeTitle="CERRAR";
+                    spinner_u_medida.showSpinerDialog();
+                } } );
+
                 spinner_u_medida.bindOnSpinerListener(new OnSpinerItemClick() {
                     @Override
                     public void onClick(String s, int i) {
                         txt_u_medida.setText(contenedores_arrays.u_medida.get(i));
+
+                        if(contenedores_arrays.u_medida.get(i).equals("CARRITO NORMAL")){
+                           txt_cantidad.setText("1");
+                            horas_aviarios_dialogs();
+                            txt_cantidad.setOnClickListener(new View.OnClickListener() {  @Override
+                            public void onClick(View v) {
+                                // DEJA INACTIVO EL CUADRO DE CANTIDADES
+                            } } );
+                        }
+                        else {
+                            contenedores_arrays.cargar_cantidades(registro_liberados.this);
+                            spinner_cantidades.bindOnSpinerListener(new OnSpinerItemClick() {
+                                @Override
+                                public void onClick(String s, int i) {
+                                    txt_cantidad.setText(contenedores_arrays.cantidades .get(i));
+                                    horas_aviarios_dialogs();
+                                }
+                            });
+                            spinner_cantidades.dTitle="SELECCIONE CANTIDAD DE CAJONES";
+                            spinner_cantidades.closeTitle="CERRAR";
+
+                            spinner_cantidades.showSpinerDialog();
+
+                            txt_cantidad.setOnClickListener(new View.OnClickListener() {  @Override
+                            public void onClick(View v) { // ESTA OPCION SE DA ACTIVA, EN EL CASO DE QUE SE QUIERA SELECCIONAR SOLAMENTE ESE COMBOBOX
+                                spinner_cantidades.dTitle="SELECCIONE CANTIDAD DE CAJONES";
+                                spinner_cantidades.closeTitle="CERRAR";
+                                spinner_cantidades.showSpinerDialog();
+                            } } );
+                        }
+
+
+
                     }
                 });
                 spinner_u_medida.dTitle="SELECCIONAR UNIDAD DE MEDIDA";
+                spinner_u_medida.closeTitle="CERRAR";
                 spinner_u_medida.showSpinerDialog();
             }
         });
-        txt_u_medida.setOnClickListener(new View.OnClickListener() {  @Override
-        public void onClick(View v) { // ESTA OPCION SE DA ACTIVA, EN EL CASO DE QUE SE QUIERA SELECCIONAR SOLAMENTE ESE COMBOBOX
-            spinner_u_medida.dTitle="SELECCIONAR UNIDAD DE MEDIDA";
-            spinner_u_medida.showSpinerDialog();
-        } } );
+
     }
 
     public void ir_fecha_clasificacion (View v){
@@ -228,6 +228,7 @@ public class registro_liberados extends AppCompatActivity {
     public void ir_tipo (View v){
 
         spinner_tipo_huevo.dTitle="SELECCIONAR TIPO DE HUEVO";
+        spinner_tipo_huevo.closeTitle="CERRAR";
         spinner_tipo_huevo.showSpinerDialog();
     }
     private void verificarYPedirPermisosDeCamara() {
@@ -297,8 +298,35 @@ public class registro_liberados extends AppCompatActivity {
                         .setBackgroundColor(R.color.viewfinder_laser)
                         .show();
             }
+            else if(Date.parse(fecha_registro)<Date.parse(txt_fecha_clasificacion.getText().toString()))
+            {
+                Alerter.create(this)
+                        .setTitle("ATENCION!")
+                        .setText("ERROR, FECHA DE CLASIFICACION ES MAYOR A LA FECHA DE HOY")
+                        .setDuration(10000)
+                        .setBackgroundColor(R.color.viewfinder_laser)
+                        .show();
+            }
+            else if(Date.parse(fecha_registro)<Date.parse(txt_fecha_puesta.getText().toString()))
+            {
+                Alerter.create(this)
+                        .setTitle("ATENCION!")
+                        .setText("ERROR, FECHA DE PUESTA ES MAYOR A LA FECHA DE HOY")
+                        .setDuration(10000)
+                        .setBackgroundColor(R.color.viewfinder_laser)
+                        .show();
+            }
+            else if(Date.parse(txt_fecha_clasificacion.getText().toString())<Date.parse(txt_fecha_puesta.getText().toString()))
+            {
+                Alerter.create(this)
+                        .setTitle("ATENCION!")
+                        .setText("ERROR, FECHA DE CLASIFICACION NO PUEDE SER MENOR A LA FECHA DE PUESTA")
+                        .setDuration(10000)
+                        .setBackgroundColor(R.color.viewfinder_laser)
+                        .show();
+            }
             else if (txt_carro.getText().toString().trim().length()==0||txt_fecha_puesta.getText().toString().trim().length()==0||txt_fecha_clasificacion.getText().toString().trim().length()==0
-                    ||txt_tipo_huevo.getText().toString().trim().length()==0||txt_tipo_almacenamiento.getText().toString().trim().length()==0||txt_tipo_aviario.getText().toString().trim().length()==0
+                    ||txt_tipo_huevo.getText().toString().trim().length()==0||txt_tipo_aviario.getText().toString().trim().length()==0
                     ||txt_tipo_maples.getText().toString().trim().length()==0||txt_hora_inicio.getText().toString().trim().length()==0||txt_hora_fin.getText().toString().trim().length()==0
                     ||txt_u_medida.getText().toString().trim().length()==0||txt_cantidad.getText().toString().trim().length()==0||txt_responsable.getText().toString().trim().length()==0
                     ||txt_liberado_por.getText().toString().trim().length()==0)
@@ -328,6 +356,15 @@ public class registro_liberados extends AppCompatActivity {
                 String cod_carrito_codigo=null;
                 int CantidadUMedida=0;
                 String u_medida=null;
+                String tipo_almacenamiento="";
+
+                if(txt_carro.getText().toString().substring(0,1).equals("6")){
+                    tipo_almacenamiento="C";
+                }
+                else if(txt_carro.getText().toString().substring(0,1).equals("9")){
+                    tipo_almacenamiento="P";
+                }
+
                 if(txt_tipo_huevo.getText().toString().equals("A")){
                     cod_carrito_codigo="4";
                 }
@@ -382,7 +419,7 @@ public class registro_liberados extends AppCompatActivity {
                 values.put("clasificadora_actual", contenedor_usuario.area);
                 values.put("empacadora",cbox_empacadora.getSelectedItemsAsString());
                 values.put("aviario",txt_tipo_aviario.getText().toString());
-                values.put("tipo_almacenamiento",txt_tipo_almacenamiento.getText().toString());
+                values.put("tipo_almacenamiento",tipo_almacenamiento);
                 values.put("liberado_por",txt_liberado_por.getText().toString());
                 values.put("comentario",txt_comentario.getText().toString());
                 values.put("codigo_borroso",codigo_borroso);
@@ -424,5 +461,46 @@ public class registro_liberados extends AppCompatActivity {
     public static registro_liberados newInstance() {
         registro_liberados fragment = new registro_liberados();
         return fragment;
+    }
+
+    private void horas_aviarios_dialogs(){
+        spinner_hora_inicio.showSpinerDialog();
+        spinner_hora_inicio.closeTitle="CERRAR";
+        txt_hora_inicio.setOnClickListener(new View.OnClickListener() {  @Override
+        public void onClick(View v) {
+            spinner_hora_inicio.showSpinerDialog();
+            spinner_hora_inicio.closeTitle="CERRAR";
+
+        } } );
+
+        spinner_hora_inicio.bindOnSpinerListener(new OnSpinerItemClick() {
+            @Override
+            public void onClick(String s, int i) {
+                txt_hora_inicio.setText(contenedores_arrays.horas.get(i));
+
+                spinner_hora_fin.bindOnSpinerListener(new OnSpinerItemClick() {
+                    @Override
+                    public void onClick(String s, int i) {
+                        txt_hora_fin.setText(contenedores_arrays.horas.get(i));
+
+                        spinner_tipo_aviario.bindOnSpinerListener(new OnSpinerItemClick() {
+                            @Override
+                            public void onClick(String s, int i) {
+                                txt_tipo_aviario.setText(contenedores_arrays.tipos_aviarios.get(i));
+                                txt_responsable.requestFocus();
+                            }
+                        });
+                        spinner_tipo_aviario.dTitle="SELECCIONAR TIPO DE AVIARIO";
+                        spinner_tipo_aviario.closeTitle="CERRAR";
+                        spinner_tipo_aviario.showSpinerDialog();
+                    }
+                });
+                spinner_hora_fin.dTitle="SELECCIONAR HORA FINAL";
+                spinner_hora_fin.closeTitle="CERRAR";
+                spinner_hora_fin.showSpinerDialog();
+
+            }
+        });
+
     }
 }

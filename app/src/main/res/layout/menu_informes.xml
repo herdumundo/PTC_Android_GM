@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".menu_informes">
+
+    <Button
+        android:id="@+id/btn_desm"
+        android:layout_width="379dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/btn_ir_liberados"
+        android:layout_centerInParent="true"
+        android:layout_marginTop="84dp"
+        android:background="@drawable/boton_negro"
+        android:drawableLeft="@mipmap/ic_error_envio"
+        android:onClick="ir_informe_exportacion_fallida"
+        android:text="DETALLE CARROS NO ENVIADOS."
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="MissingConstraints" />
+
+    <Button
+        android:id="@+id/btn_desm4"
+        android:layout_width="379dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/btn_ir_liberados"
+        android:layout_centerInParent="true"
+        android:layout_marginTop="28dp"
+        android:background="@drawable/boton_negro"
+        android:drawableLeft="@mipmap/ic_informe"
+        android:onClick="ir_informe_exportacion_fallida"
+        android:text="VISUALIZAR REGISTROS"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btn_desm"
+        tools:ignore="MissingConstraints" />
+</androidx.constraintlayout.widget.ConstraintLayout>

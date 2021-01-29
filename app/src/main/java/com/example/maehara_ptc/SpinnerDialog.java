@@ -15,6 +15,10 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.example.maehara_ptc.ArrayAdapterWithContainsFilter;
+import com.example.maehara_ptc.OnSpinerItemClick;
+import com.example.maehara_ptc.R;
+
 import java.util.ArrayList;
 
 import androidx.annotation.NonNull;

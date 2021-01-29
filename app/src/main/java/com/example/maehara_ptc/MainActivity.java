@@ -19,12 +19,12 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 
 import Utilidades.contenedor_usuario;
+import Utilidades.voids;
 import androidx.appcompat.app.AppCompatActivity;
 
 public class MainActivity extends AppCompatActivity {
     Connection connect;
-    ConexionSQLiteHelper conn;
-    private ProgressDialog progress_sincro;
+     private ProgressDialog progress_sincro;
     TextView txt_usuario,txt_pass;
     String mensaje="";
     @Override
@@ -39,14 +39,13 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         txt_usuario=(TextView)findViewById(R.id.txt_responsable);
         txt_pass=(TextView)findViewById(R.id.txt_pass);
-        conn=new ConexionSQLiteHelper(getApplicationContext(),"BD_SQLITE_GM",null,1);
-
+        voids.conexion_sqlite(this);
     }
 
     private void sincronizar_usuarios() {
         try {
             borrar_usuario();
-            SQLiteDatabase db=conn.getReadableDatabase();
+            SQLiteDatabase db=voids.conn.getReadableDatabase();
             ConnectionHelperGrupomaehara conexion = new  ConnectionHelperGrupomaehara();
             connect = conexion.Connections();
             Statement stmt = connect.createStatement();
@@ -73,7 +72,7 @@ public class MainActivity extends AppCompatActivity {
     private void sincronizar_empacadoras() {
         try {
             borrar_empacadoras();
-            SQLiteDatabase db=conn.getReadableDatabase();
+            SQLiteDatabase db= voids.conn.getReadableDatabase();
             ConnectionHelperGrupomaehara conexion = new ConnectionHelperGrupomaehara();
             connect = conexion.Connections();
             Statement stmt = connect.createStatement();
@@ -97,7 +96,7 @@ public class MainActivity extends AppCompatActivity {
      private void sincronizar_motivo_retencion() {
         try {
             borrar_motivo_retencion();
-            SQLiteDatabase db=conn.getReadableDatabase();
+            SQLiteDatabase db=voids.conn.getReadableDatabase();
             ConnectionHelperGrupomaehara conexion = new ConnectionHelperGrupomaehara();
             connect = conexion.Connections();
             Statement stmt = connect.createStatement();
@@ -121,18 +120,18 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void borrar_usuario(){
-        SQLiteDatabase db1=conn.getReadableDatabase();
+        SQLiteDatabase db1=voids.conn.getReadableDatabase();
         db1.execSQL("delete from usuarios");
         db1.close();
     }
     private void borrar_motivo_retencion(){
-        SQLiteDatabase db1=conn.getReadableDatabase();
+        SQLiteDatabase db1=voids.conn.getReadableDatabase();
         db1.execSQL("delete from motivo_retencion");
         db1.close();
     }
 
      private void borrar_empacadoras(){
-        SQLiteDatabase db1=conn.getReadableDatabase();
+        SQLiteDatabase db1=voids.conn.getReadableDatabase();
         db1.execSQL("delete from empacadoras");
         db1.close();
     }
@@ -184,7 +183,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void login (View v){
 
-        SQLiteDatabase db=conn.getReadableDatabase();
+        SQLiteDatabase db=voids.conn.getReadableDatabase();
         Cursor cursor=db.rawQuery("SELECT usuario,clasificadora,nombre FROM  usuarios " +
         "where  usuario ='"+txt_usuario.getText().toString().trim()+"' " +
         "and    password='"+txt_pass.getText().toString().trim()+"'" ,null);

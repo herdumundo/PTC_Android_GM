@@ -13,9 +13,10 @@
         android:layout_below="@+id/codigo_especial"
 
         android:layout_alignParentStart="true"
-        android:layout_centerHorizontal="true"
+        android:layout_alignParentEnd="true"
         android:layout_marginStart="7dp"
         android:layout_marginTop="-3dp"
+        android:layout_marginEnd="8dp"
         android:ems="10"
         android:gravity="center"
         android:text="Tipo de maple"
@@ -30,12 +31,12 @@
 
     <TextView
         android:id="@+id/txt_spinner_deposito2"
-        android:layout_width="wrap_content"
+        android:layout_width="150dp"
         android:layout_height="wrap_content"
         android:layout_below="@+id/txt_tipo_maples"
         android:layout_alignParentStart="true"
 
-        android:layout_marginStart="9dp"
+        android:layout_marginStart="8dp"
         android:layout_marginTop="12dp"
         android:ems="10"
         android:gravity="center"
@@ -50,56 +51,16 @@
         tools:layout_editor_absoluteY="156dp" />
 
     <TextView
-        android:id="@+id/txt_spinner_deposito5"
-        android:layout_width="184dp"
+        android:id="@+id/txt_spinner_deposito13"
+        android:layout_width="150dp"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/txt_tipo_huevo"
-        android:layout_alignParentStart="true"
-
-        android:layout_marginStart="11dp"
-        android:layout_marginTop="10dp"
-        android:ems="10"
-        android:gravity="center"
-        android:text="Empacadoras"
-        android:textColor="#000000"
-        android:textColorHint="#232121"
-        android:textSize="14sp"
-        android:textStyle="normal|bold|italic"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="parent"
-        tools:layout_editor_absoluteY="156dp" />
-
-    <TextView
-        android:id="@+id/txt_spinner_deposito6"
-        android:layout_width="158dp"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/txt_u_medida"
+        android:layout_below="@+id/txt_cantidad"
 
         android:layout_alignParentEnd="true"
-        android:layout_marginTop="10dp"
-        android:layout_marginEnd="15dp"
-        android:ems="10"
-        android:gravity="center"
-        android:text="Cantidad"
-        android:textColor="#000000"
-        android:textColorHint="#232121"
-        android:textSize="14sp"
-        android:textStyle="normal|bold|italic"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="parent"
-        tools:layout_editor_absoluteY="156dp" />
-
-    <TextView
-        android:id="@+id/txt_spinner_deposito13"
-        android:layout_width="189dp"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/txt_hora_inicio"
-        android:layout_alignParentStart="true"
-
-        android:layout_marginStart="10dp"
-        android:layout_marginTop="7dp"
+        android:layout_marginStart="63dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginEnd="9dp"
+        android:layout_toEndOf="@+id/txt_spinner_deposito12"
         android:ems="10"
         android:gravity="center"
         android:text="Tipo de aviario"
@@ -113,17 +74,19 @@
         tools:layout_editor_absoluteY="156dp" />
 
     <TextView
-        android:id="@+id/txt_spinner_deposito14"
-        android:layout_width="189dp"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/txt_hora_fin"
-
+        android:id="@+id/txt_tipo_aviario"
+        android:layout_width="150dp"
+        android:layout_height="40dp"
+        android:layout_below="@+id/txt_spinner_deposito13"
         android:layout_alignParentEnd="true"
-        android:layout_marginTop="10dp"
-        android:layout_marginEnd="10dp"
+        android:layout_marginStart="62dp"
+        android:layout_marginTop="0dp"
+        android:layout_marginEnd="9dp"
+        android:layout_toEndOf="@+id/txt_hora_fin"
+
+        android:background="@drawable/text_shape"
+        android:drawableEnd="@drawable/ic_action_spinner"
         android:ems="10"
-        android:gravity="center"
-        android:text="Tipo de almacenamiento"
         android:textColor="#000000"
         android:textColorHint="#232121"
         android:textSize="14sp"
@@ -135,14 +98,13 @@
 
     <TextView
         android:id="@+id/txt_spinner_deposito9"
-        android:layout_width="189dp"
+        android:layout_width="150dp"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/txt_carro"
+        android:layout_below="@+id/txt_tipo_huevo"
         android:layout_alignParentStart="true"
 
-        android:layout_centerVertical="true"
-        android:layout_marginStart="15dp"
-        android:layout_marginTop="10dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="12dp"
         android:ems="10"
         android:gravity="center"
         android:text="Hora de inicio"
@@ -156,14 +118,35 @@
         tools:layout_editor_absoluteY="156dp" />
 
     <TextView
-        android:id="@+id/txt_spinner_deposito12"
-        android:layout_width="178dp"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/btnEscanear"
+        android:id="@+id/txt_hora_fin"
+        android:layout_width="150dp"
+        android:layout_height="40dp"
+        android:layout_below="@+id/txt_spinner_deposito12"
 
-        android:layout_alignParentEnd="true"
-        android:layout_marginTop="10dp"
-        android:layout_marginEnd="3dp"
+        android:layout_marginStart="70dp"
+        android:layout_marginTop="0dp"
+        android:layout_toEndOf="@+id/txt_hora_inicio"
+        android:background="@drawable/text_shape"
+        android:drawableEnd="@drawable/ic_action_spinner"
+        android:ems="10"
+        android:textColor="#000000"
+        android:textColorHint="#232121"
+        android:textSize="14sp"
+        android:textStyle="normal|bold|italic"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:layout_editor_absoluteY="156dp" />
+
+    <TextView
+        android:id="@+id/txt_spinner_deposito12"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+
+        android:layout_below="@+id/txt_u_medida"
+        android:layout_marginStart="70dp"
+        android:layout_marginTop="12dp"
+        android:layout_toEndOf="@+id/txt_spinner_deposito9"
         android:ems="10"
         android:gravity="center"
         android:text="Hora final"
@@ -176,63 +159,29 @@
         app:layout_constraintStart_toStartOf="parent"
         tools:layout_editor_absoluteY="156dp" />
 
-    <TextView
-        android:id="@+id/txt_spinner_deposito3"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/txt_tipo_maples"
 
-        android:layout_alignParentEnd="true"
-        android:layout_marginTop="12dp"
-        android:layout_marginEnd="9dp"
-        android:ems="10"
-        android:gravity="center"
-        android:text="Unidad de medida"
-        android:textColor="#000000"
-        android:textColorHint="#232121"
-        android:textSize="14sp"
-        android:textStyle="normal|bold|italic"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="parent"
-        tools:layout_editor_absoluteY="156dp" />
-
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/txt_comentario2"
-        android:layout_width="wrap_content"
-        android:layout_height="65dp"
+    <Button
+        android:id="@+id/button5"
+        android:layout_width="540dp"
+        android:layout_height="85dp"
+        android:layout_below="@+id/txt_comentario2"
         android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="635dp"
-        android:layout_marginEnd="5dp"
-        android:background="@drawable/text_shape_color1">
-
-        <AutoCompleteTextView
-            android:id="@+id/txt_comentario"
-            android:layout_width="641dp"
-            android:layout_height="43dp"
-
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentBottom="true"
-            android:layout_marginEnd="3dp"
-            android:layout_marginBottom="3dp"
-            android:hint="COMENTARIO"
-            android:inputType="text"
-            android:maxLines="1"
-            android:singleLine="true" />
-
-    </com.google.android.material.textfield.TextInputLayout  >
+        android:layout_marginStart="31dp"
+        android:layout_marginTop="33dp"
+        android:layout_marginEnd="31dp"
+        android:background="@drawable/botonazul"
+        android:onClick="registrar_liberados"
+        android:text="REGISTRAR" />
 
     <com.google.android.material.textfield.TextInputLayout
         android:layout_width="185dp"
         android:layout_height="67dp"
-        android:layout_below="@+id/txt_tipo_aviario"
+        android:layout_below="@+id/cbox_empacadora"
         android:layout_alignParentStart="true"
-        android:layout_marginStart="13dp"
-        android:layout_marginTop="10dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="13dp"
         android:background="@drawable/text_shape_color1">
 
         <AutoCompleteTextView
@@ -242,36 +191,71 @@
 
             android:layout_alignParentEnd="true"
             android:layout_alignParentBottom="true"
-            android:layout_marginEnd="-4dp"
-            android:layout_marginBottom="9dp"
+            android:layout_marginEnd="3dp"
+            android:layout_marginBottom="4dp"
             android:hint="RESPONSABLE"
             android:inputType="text"
             android:maxLines="1"
             android:singleLine="true" />
 
-    </com.google.android.material.textfield.TextInputLayout  >
+    </com.google.android.material.textfield.TextInputLayout>
 
+    <com.google.android.material.textfield.TextInputLayout
+        android:layout_width="185dp"
+        android:layout_height="67dp"
+        android:layout_below="@+id/btnEscanear"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="13dp"
+        android:layout_marginEnd="8dp"
+        android:background="@drawable/text_shape_color1">
 
-    <Button
-        android:id="@+id/button5"
+        <AutoCompleteTextView
+            android:id="@+id/txt_liberado_por"
+            android:layout_width="174dp"
+            android:layout_height="45dp"
+
+            android:layout_marginEnd="1dp"
+            android:layout_marginBottom="1dp"
+            android:hint="LIBERADO POR"
+            android:inputType="text"
+            android:maxLines="1"
+            android:singleLine="true" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/txt_comentario2"
         android:layout_width="wrap_content"
-        android:layout_height="85dp"
-        android:layout_below="@+id/txt_comentario2"
+        android:layout_height="65dp"
+        android:layout_below="@+id/txt_carro"
         android:layout_alignParentStart="true"
         android:layout_alignParentEnd="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginStart="56dp"
-        android:layout_marginTop="64dp"
-        android:layout_marginEnd="57dp"
-        android:background="@drawable/botonazul"
-        android:text="REGISTRAR"
-        android:onClick="registrar_liberados"/>
+        android:layout_marginStart="13dp"
+        android:layout_marginTop="107dp"
+        android:layout_marginEnd="8dp"
+        android:background="@drawable/text_shape_color1">
+
+        <AutoCompleteTextView
+            android:id="@+id/txt_comentario"
+            android:layout_width="641dp"
+            android:layout_height="43dp"
+
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginEnd="-71dp"
+            android:layout_marginBottom="1dp"
+            android:hint="COMENTARIO"
+            android:inputType="text"
+            android:maxLines="1"
+            android:singleLine="true" />
+
+    </com.google.android.material.textfield.TextInputLayout>
 
     <Button
         android:id="@+id/btn_fecha_clasificacion"
 
         android:layout_width="131dp"
-        android:layout_height="36dp"
+        android:layout_height="40dp"
         android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true"
         android:layout_marginStart="2dp"
@@ -287,7 +271,7 @@
     <TextView
         android:id="@+id/txt_spinner_deposito11"
         android:layout_width="120dp"
-        android:layout_height="36dp"
+        android:layout_height="40dp"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
         android:layout_centerVertical="true"
@@ -308,7 +292,7 @@
         android:id="@+id/btn_fecha_puesta"
 
         android:layout_width="124dp"
-        android:layout_height="36dp"
+        android:layout_height="40dp"
         android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true"
         android:layout_marginStart="1dp"
@@ -323,7 +307,7 @@
     <TextView
         android:id="@+id/txt_fecha_puesta"
         android:layout_width="141dp"
-        android:layout_height="36dp"
+        android:layout_height="40dp"
         android:layout_alignParentTop="true"
         android:layout_centerVertical="true"
         android:layout_marginStart="7dp"
@@ -341,78 +325,15 @@
 
     <TextView
         android:id="@+id/txt_hora_inicio"
-        android:layout_width="189dp"
-        android:layout_height="wrap_content"
+        android:layout_width="150dp"
+        android:layout_height="40dp"
         android:layout_below="@+id/txt_spinner_deposito9"
         android:layout_alignParentStart="true"
-        android:layout_marginStart="10dp"
+        android:layout_marginStart="8dp"
         android:layout_marginTop="0dp"
         android:background="@drawable/text_shape"
         android:drawableEnd="@drawable/ic_action_spinner"
 
-        android:ems="10"
-        android:textColor="#000000"
-        android:textColorHint="#232121"
-        android:textSize="14sp"
-        android:textStyle="normal|bold|italic"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="parent"
-        tools:layout_editor_absoluteY="156dp" />
-
-    <TextView
-        android:id="@+id/txt_tipo_aviario"
-        android:layout_width="192dp"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/txt_spinner_deposito13"
-        android:layout_alignParentStart="true"
-        android:layout_marginStart="10dp"
-        android:layout_marginTop="0dp"
-        android:background="@drawable/text_shape"
-        android:drawableEnd="@drawable/ic_action_spinner"
-        android:ems="10"
-        android:textColor="#000000"
-
-        android:textColorHint="#232121"
-        android:textSize="14sp"
-        android:textStyle="normal|bold|italic"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="parent"
-        tools:layout_editor_absoluteY="156dp" />
-
-    <TextView
-        android:id="@+id/txt_tipo_almacenamiento"
-        android:layout_width="183dp"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/txt_spinner_deposito14"
-        android:layout_alignParentEnd="true"
-        android:layout_marginTop="0dp"
-        android:layout_marginEnd="9dp"
-        android:background="@drawable/text_shape"
-        android:drawableEnd="@drawable/ic_action_spinner"
-        android:ems="10"
-
-        android:textColor="#000000"
-        android:textColorHint="#232121"
-        android:textSize="14sp"
-        android:textStyle="normal|bold|italic"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="parent"
-        tools:layout_editor_absoluteY="156dp" />
-
-    <TextView
-        android:id="@+id/txt_hora_fin"
-        android:layout_width="179dp"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/txt_spinner_deposito12"
-
-        android:layout_alignParentEnd="true"
-        android:layout_marginTop="0dp"
-        android:layout_marginEnd="10dp"
-        android:background="@drawable/text_shape"
-        android:drawableEnd="@drawable/ic_action_spinner"
         android:ems="10"
         android:textColor="#000000"
         android:textColorHint="#232121"
@@ -430,11 +351,10 @@
         android:layout_below="@+id/txt_spinner_deposito"
         android:layout_alignParentStart="true"
         android:layout_alignParentEnd="true"
-        android:layout_centerHorizontal="true"
         android:layout_marginStart="8dp"
 
         android:layout_marginTop="1dp"
-        android:layout_marginEnd="8dp"
+        android:layout_marginEnd="9dp"
         android:background="@drawable/text_shape"
         android:drawableEnd="@drawable/ic_action_spinner"
         android:ems="10"
@@ -450,11 +370,11 @@
 
     <TextView
         android:id="@+id/txt_tipo_huevo"
-        android:layout_width="167dp"
-        android:layout_height="wrap_content"
+        android:layout_width="150dp"
+        android:layout_height="40dp"
         android:layout_below="@+id/txt_spinner_deposito2"
         android:layout_alignParentStart="true"
-        android:layout_marginStart="10dp"
+        android:layout_marginStart="8dp"
         android:layout_marginTop="0dp"
         android:background="@drawable/text_shape"
         android:drawableEnd="@drawable/ic_action_spinner"
@@ -471,13 +391,13 @@
 
     <TextView
         android:id="@+id/txt_u_medida"
-        android:layout_width="162dp"
-        android:layout_height="wrap_content"
+        android:layout_width="150dp"
+        android:layout_height="40dp"
         android:layout_below="@+id/txt_spinner_deposito3"
-        android:layout_alignParentEnd="true"
 
+        android:layout_marginStart="70dp"
         android:layout_marginTop="0dp"
-        android:layout_marginEnd="10dp"
+        android:layout_toEndOf="@+id/txt_tipo_huevo"
         android:background="@drawable/text_shape"
         android:drawableEnd="@drawable/ic_action_spinner"
         android:ems="10"
@@ -490,18 +410,65 @@
         app:layout_constraintStart_toStartOf="parent"
         tools:layout_editor_absoluteY="156dp" />
 
-    <EditText
+    <TextView
+        android:id="@+id/txt_spinner_deposito3"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/txt_tipo_maples"
+
+        android:layout_marginStart="70dp"
+        android:layout_marginTop="12dp"
+        android:layout_toEndOf="@+id/txt_spinner_deposito2"
+        android:ems="10"
+        android:gravity="center"
+        android:text="Unidad de medida"
+        android:textColor="#000000"
+        android:textColorHint="#232121"
+        android:textSize="14sp"
+        android:textStyle="normal|bold|italic"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:layout_editor_absoluteY="156dp" />
+
+    <TextView
         android:id="@+id/txt_cantidad"
-        android:layout_width="162dp"
+        android:layout_width="150dp"
         android:layout_height="40dp"
         android:layout_below="@+id/txt_spinner_deposito6"
         android:layout_alignParentEnd="true"
+        android:layout_marginStart="62dp"
         android:layout_marginTop="0dp"
-        android:layout_marginEnd="12dp"
+        android:layout_marginEnd="8dp"
+        android:layout_toEndOf="@+id/txt_u_medida"
         android:background="@drawable/text_shape"
         android:ems="10"
+        android:drawableEnd="@drawable/ic_action_spinner"
         android:hint="0"
         android:inputType="number"
+        android:textColor="#000000"
+        android:textColorHint="#817E7E"
+        android:textSize="14sp"
+        android:textStyle="normal|bold|italic"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:layout_editor_absoluteY="156dp" />
+
+    <TextView
+        android:id="@+id/txt_spinner_deposito6"
+        android:layout_width="126dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/txt_tipo_maples"
+
+        android:layout_alignParentEnd="true"
+        android:layout_marginStart="62dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginEnd="7dp"
+        android:layout_toEndOf="@+id/txt_spinner_deposito3"
+        android:ems="10"
+        android:gravity="center"
+        android:text="Cantidad"
         android:textColor="#000000"
         android:textColorHint="#232121"
         android:textSize="14sp"
@@ -514,7 +481,7 @@
     <TextView
         android:id="@+id/txt_fecha_clasificacion"
         android:layout_width="97dp"
-        android:layout_height="36dp"
+        android:layout_height="40dp"
         android:layout_alignParentTop="true"
         android:layout_marginStart="1dp"
         android:layout_marginTop="4dp"
@@ -532,7 +499,7 @@
     <TextView
         android:id="@+id/txt_spinner_deposito10"
         android:layout_width="wrap_content"
-        android:layout_height="36dp"
+        android:layout_height="40dp"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
 
@@ -551,64 +518,82 @@
 
     <com.example.maehara_ptc.MultipleSelectionSpinner
         android:id="@+id/cbox_empacadora"
-        android:layout_width="185dp"
+        android:layout_width="150dp"
 
         android:layout_height="40dp"
         android:layout_below="@+id/txt_spinner_deposito5"
         android:layout_alignParentStart="true"
-        android:layout_marginStart="9dp"
+        android:layout_marginStart="8dp"
         android:layout_marginTop="0dp"
         android:background="@drawable/text_shape" />
 
-    <EditText
-        android:id="@+id/txt_carro"
-        android:layout_width="189dp"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/cbox_empacadora"
-        android:layout_alignParentStart="true"
-        android:layout_marginStart="14dp"
-        android:layout_marginTop="8dp"
-        android:ems="10"
-        android:hint="NRO DE CARRO"
-        android:inputType="number" />
-
     <Button
         android:id="@+id/btnEscanear"
-        android:layout_width="172dp"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/txt_cantidad"
+        android:layout_width="150dp"
+        android:layout_height="40dp"
+        android:layout_below="@+id/txt_tipo_aviario"
         android:layout_alignParentEnd="true"
-        android:layout_marginStart="38dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginEnd="-3dp"
+        android:layout_marginStart="61dp"
+        android:layout_marginTop="33dp"
+        android:layout_marginEnd="9dp"
         android:layout_toEndOf="@+id/txt_carro"
         android:background="@drawable/boton"
         android:text="Leer por camara" />
 
-    <com.google.android.material.textfield.TextInputLayout
-        android:layout_width="185dp"
-        android:layout_height="67dp"
-        android:layout_below="@+id/txt_tipo_almacenamiento"
-        android:layout_alignParentEnd="true"
-        android:layout_marginTop="7dp"
-        android:layout_marginEnd="6dp"
-        android:background="@drawable/text_shape_color1">
+    <TextView
+        android:id="@+id/txt_spinner_deposito4"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/txt_hora_fin"
 
-        <AutoCompleteTextView
-            android:id="@+id/txt_liberado_por"
-            android:layout_width="174dp"
-            android:layout_height="45dp"
+        android:layout_centerHorizontal="true"
+        android:layout_marginStart="70dp"
+        android:layout_marginTop="12dp"
+        android:layout_toEndOf="@+id/txt_spinner_deposito5"
+        android:ems="10"
+        android:gravity="center"
+        android:text="Nro carro"
+        android:textColor="#000000"
+        android:textColorHint="#232121"
+        android:textSize="14sp"
+        android:textStyle="normal|bold|italic"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:layout_editor_absoluteY="156dp" />
 
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentBottom="true"
-            android:layout_marginEnd="-9dp"
-            android:layout_marginBottom="-2dp"
-            android:hint="LIBERADO POR"
-            android:inputType="text"
-            android:maxLines="1"
-            android:singleLine="true" />
+    <TextView
+        android:id="@+id/txt_spinner_deposito5"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/txt_hora_inicio"
+        android:layout_alignParentStart="true"
 
-    </com.google.android.material.textfield.TextInputLayout  >
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="12dp"
+        android:ems="10"
+        android:gravity="center"
+        android:text="Empacadoras"
+        android:textColor="#000000"
+        android:textColorHint="#232121"
+        android:textSize="14sp"
+        android:textStyle="normal|bold|italic"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:layout_editor_absoluteY="156dp" />
+
+    <EditText
+        android:id="@+id/txt_carro"
+        android:layout_width="150dp"
+        android:layout_height="40dp"
+        android:layout_below="@+id/txt_spinner_deposito4"
+        android:layout_marginStart="70dp"
+        android:layout_marginTop="0dp"
+        android:layout_toEndOf="@+id/cbox_empacadora"
+        android:ems="10"
+        android:hint="NRO DE CARRO"
+        android:inputType="number" />
 
     <ToggleButton
         android:id="@+id/codigo_especial"

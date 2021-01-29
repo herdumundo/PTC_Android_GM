@@ -7,7 +7,13 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Color;
+import android.graphics.drawable.ClipDrawable;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.GradientDrawable;
+import android.graphics.drawable.LayerDrawable;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.TextView;
 
@@ -32,24 +38,8 @@ public class menu_principal extends AppCompatActivity {
     private volatile boolean flag = true;
     String mensaje_importacion="";
     public void onBackPressed()  {
-        new AlertDialog.Builder(this)
-                .setIcon(android.R.drawable.ic_dialog_alert)
-                .setTitle("ATENCION!!!.")
-                .setMessage("DESEA SALIR DE LA APLICACION?.")
-                .setPositiveButton("SI", new DialogInterface.OnClickListener()
-                {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                    Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                        finish();
-                        startActivity(intent);
-                    }
-
-                })
-                .setNegativeButton("NO", null)
-                .show();
-    }
+        voids.volver_atras(this,this,MainActivity.class,"DESEA SALIR DE LA APLICACION?",1);
+      }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -73,9 +63,9 @@ public class menu_principal extends AppCompatActivity {
         finish();
     }
 
-    public void ir_informe_exportacion_fallida(View v){
+    public void ir_menu_informes(View v){
         flag=false;
-        Intent i=new Intent(this, lista_exportaciones_fallidas.class);
+        Intent i=new Intent(this, menu_informes.class);
         startActivity(i);
         finish();
     }
@@ -93,9 +83,14 @@ public class menu_principal extends AppCompatActivity {
         {
         }
     }
-    public void sincro (View view){
+    public void exportar (View view){
+
         exportar_datos();
-      /*  try {
+    }
+
+    public void sincro (View view){
+
+       try {
             //
             ConnectionHelperGrupomaehara conexion = new ConnectionHelperGrupomaehara();
             connect = conexion.Connections();
@@ -150,7 +145,7 @@ public class menu_principal extends AppCompatActivity {
                     }
                 })
                 .setNegativeButton("NO", null)
-                .show();*/
+                .show();
     }
     class t_lotes extends Thread {
         @Override
@@ -277,6 +272,6 @@ public class menu_principal extends AppCompatActivity {
     }
 
     private void exportar_datos(){
-        voids.exportar(this);
+        voids.exportar(this,0,1);
     }
 }

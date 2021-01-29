@@ -1,169 +1,232 @@
 package Utilidades;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.view.View;
 import android.widget.DatePicker;
 
 import com.example.maehara_ptc.ConexionSQLiteHelper;
 import com.example.maehara_ptc.ConnectionHelperGrupomaehara;
+import com.example.maehara_ptc.R;
 import com.example.maehara_ptc.menu_principal;
 import com.example.maehara_ptc.registro_liberados;
+import com.tapadoo.alerter.Alerter;
 
 import java.sql.CallableStatement;
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.Types;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 
-public class voids {
-   public static ConexionSQLiteHelper conn;
+    public class voids
+    {
 
-    public static void conexion_sqlite(Context context) {
-          conn=new ConexionSQLiteHelper(context,"BD_SQLITE_GM",null,1);
-      }
+        public static ConexionSQLiteHelper conn;
+
+        public static Connection connect;
+
+        public static void conexion_sqlite(Context context) {
+              conn=new ConexionSQLiteHelper(context,"BD_SQLITE_GM",null,2);
+
+          }
+
+        public static ArrayList<Exportaciones> lista_exportaciones_fails;
+
+        public static void calendario(Context context, final int tipo) {
 
 
-    public static ArrayList<Exportaciones> lista_exportaciones_fails;
-
-    public static void calendario(Context context, final int tipo) {
-
-
-        final Calendar cldr = Calendar.getInstance();
-        int day = cldr.get(Calendar.DAY_OF_MONTH);
-        int month = cldr.get(Calendar.MONTH);
-        int year = cldr.get(Calendar.YEAR);
-        // date picker dialog
-        registro_liberados.picker = new DatePickerDialog(context,
-                new DatePickerDialog.OnDateSetListener() {
-                    @Override
-                    public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-                        DecimalFormat df = new DecimalFormat("00");
-                        SimpleDateFormat format = new SimpleDateFormat("dd/mm/yyyy");
-                        cldr.set(year, monthOfYear, dayOfMonth);
-                        if (tipo==1){
-                            registro_liberados.txt_fecha_clasificacion.setText( df.format((dayOfMonth))+ "/" + df.format((monthOfYear + 1))  + "/" +year );
-                        }
-                        else{
-                            registro_liberados.txt_fecha_puesta.setText( df.format((dayOfMonth))+ "/" + df.format((monthOfYear + 1))  + "/" +year );
+            final Calendar cldr = Calendar.getInstance();
+            int day = cldr.get(Calendar.DAY_OF_MONTH);
+            int month = cldr.get(Calendar.MONTH);
+            int year = cldr.get(Calendar.YEAR);
+            // date picker dialog
+            registro_liberados.picker = new DatePickerDialog(context,
+                    new DatePickerDialog.OnDateSetListener() {
+                        @Override
+                        public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+                            DecimalFormat df = new DecimalFormat("00");
+                            SimpleDateFormat format = new SimpleDateFormat("dd/mm/yyyy");
+                            cldr.set(year, monthOfYear, dayOfMonth);
+                            if (tipo==1){
+                                registro_liberados.txt_fecha_clasificacion.setText( df.format((dayOfMonth))+ "/" + df.format((monthOfYear + 1))  + "/" +year );
                             }
-                    }
+                            else{
+                                registro_liberados.txt_fecha_puesta.setText( df.format((dayOfMonth))+ "/" + df.format((monthOfYear + 1))  + "/" +year );
+                                }
+                        }
 
 
-                    }, year, month, day);
-        registro_liberados.picker.show();
-    }
-
-    public static void exportar(Context context) {
-        String detalle_mensaje="";
-        ConexionSQLiteHelper conn;
-        conn=new ConexionSQLiteHelper(context,"bd_usuarios",null,1);
-
-        SQLiteDatabase db=conn.getReadableDatabase();
-        ConnectionHelperGrupomaehara conexion = new ConnectionHelperGrupomaehara();
-        Connection connect;
-
-        connect = conexion.Connections();
-        Cursor cursor;
-         try {
-            SQLiteDatabase db_UPDATE=conn.getReadableDatabase();
-
-            cursor=db.rawQuery("SELECT  * FROM lotes where   estado_registro =1  " ,null);
-            while (cursor.moveToNext()){
-                int tipo_mensaje=0;
-                CallableStatement callableStatement=null;
-                callableStatement = connect.prepareCall("{call mae_cch_pa_liberado_export( ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,? )}");
-                callableStatement .setString("@fecha_clasificacion",cursor.getString(1));   //fecha
-                callableStatement .setString("@fecha_puesta",cursor.getString(2));          //fecha_puesta
-                callableStatement .setString("@cod_carrito",cursor.getString(3));           //cod_carrito
-                callableStatement .setString("@tipo_huevo",cursor.getString(4));            //tipo_huevo
-                callableStatement .setString("@cod_clasificacion",cursor.getString(5));     //cod_clasificacion
-                callableStatement .setString("@hora_clasificacion",cursor.getString(6));    //hora_clasificacion
-                callableStatement .setString("@cod_lote",cursor.getString(7));              //cod_lote
-                callableStatement .setString("@resp_clasificacion",cursor.getString(8));    //resp_clasificacion
-                callableStatement .setString("@resp_control_calidad",cursor.getString(9));  //resp_control_calidad
-                callableStatement .setString("@usuario_upd",cursor.getString(10));          //usuario_upd
-                callableStatement .setString("@u_medida",cursor.getString(11));             //u_medida
-                callableStatement .setInt(   "@cantidad", Integer.parseInt(cursor.getString(12)));             //cantidad
-                callableStatement .setString("@clasificadora",cursor.getString(13));        //clasificadora
-                callableStatement .setString("@clasificadora_actual",cursor.getString(14)); //clasificadora_actual
-                callableStatement .setString("@empacadora",cursor.getString(15));           //empacadora
-                callableStatement .setString("@aviario",cursor.getString(16));              //aviario
-                callableStatement .setString("@tipo_almacenamiento",cursor.getString(17));  //tipo_almacenamiento
-                callableStatement .setString("@liberado_por",cursor.getString(18));         //liberado_por
-                callableStatement .setString("@comentario",cursor.getString(19));           //comentario
-                callableStatement .setString("@codigo_borroso",cursor.getString(20));       //codigo_borroso
-                callableStatement .setString("@tipo_maples",cursor.getString(21));          //tipo_maples
-                callableStatement .setString("@codigo_especial",cursor.getString(22));      //codigo_especial
-                callableStatement .setString("@estado_liberacion",cursor.getString(23));    //estado_liberacion
-                callableStatement .setString("@estado",cursor.getString(24));               //estado
-
-                callableStatement.registerOutParameter("@mensaje", Types.INTEGER);
-                //callableStatement.registerOutParameter("@detalle_mensaje", Types.VARCHAR);
-                callableStatement.execute();
-                tipo_mensaje = callableStatement.getInt("@mensaje");
-               // detalle_mensaje= callableStatement.getString("@detalle_mensaje");
-               if(tipo_mensaje>0){
-                    SQLiteDatabase db_upd=conn.getReadableDatabase();
-                    String strSQL = "UPDATE lotes SET  estado_registro="+tipo_mensaje+"  WHERE    cod_interno='"+cursor.getString(0)+"' ";
-                    db_upd.execSQL(strSQL);
-                    db_UPDATE.close();
-                }
-            }
-
-        }catch(Exception e)
-        {
-            String es=e.toString();
-            }
-    }
-
-
-    public static void consultarListaexportaciones_fallidas(Context context) {
-        ConexionSQLiteHelper conn;
-        conn=new ConexionSQLiteHelper(context,"bd_usuarios",null,1);
-
-        SQLiteDatabase db=conn.getReadableDatabase();
-        Exportaciones Exportaciones=null;
-
-         lista_exportaciones_fails=new ArrayList<Exportaciones>();
-
-        Cursor cursor=db.rawQuery("select  cod_carrito,fecha_puesta,estado_registro from lotes --where estado_registro not in(1,2)"   ,null);
-
-        while (cursor.moveToNext()){
-
-            Exportaciones=new Exportaciones();
-            Exportaciones.setcod_carrito(cursor.getString(0));
-            Exportaciones.setestado(cursor.getString(2));
-            lista_exportaciones_fails.add(Exportaciones);
+                        }, year, month, day);
+            registro_liberados.picker.show();
         }
 
-    }
+        public static void exportar(Context context,Integer cod_interno,Integer tipo) {
 
-    public static void volver_atras(final Context context)  {
-        new AlertDialog.Builder(context)
-                .setIcon(android.R.drawable.ic_dialog_alert)
-                .setTitle("ATENCION!!!.")
-                .setMessage("DESEA SALIR DEL REGISTRO PTC?.")
-                .setPositiveButton("SI", new DialogInterface.OnClickListener()
-                {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        Intent intent = new Intent(context, menu_principal.class);
-                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                        //finish();
-                        context.startActivity(intent);
+            SQLiteDatabase db=conn.getReadableDatabase();
+            ConnectionHelperGrupomaehara conexion = new ConnectionHelperGrupomaehara();
+            connect = conexion.Connections();
+            Cursor cursor;
+            try {
+                // connect.setAutoCommit(false);
+                SQLiteDatabase db_UPDATE=conn.getReadableDatabase();
+
+                if(tipo==1){ //ESTADO UNO ES IGUAL AL EXPORTADOR GLOBAL.
+                    cursor=db.rawQuery("SELECT  * FROM lotes where   estado_registro =1  " ,null);
+                }
+                else {// EN ESTE CASO EXPORTA SOLO EL REGISTRO QUE SE LE DA REENVIAR EN LA CLASE LISTA_EXPORTACIONES_FALLIDAS.
+                    cursor=db.rawQuery("SELECT  * FROM lotes where   cod_interno="+cod_interno+"  " ,null);
+                }
+                while (cursor.moveToNext()){
+
+                    int tipo_mensaje=0;
+                    CallableStatement callableStatement=null;
+                    callableStatement = connect.prepareCall("{call mae_cch_pa_liberado_export( ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,? )}");
+                    callableStatement .setString("@fecha_clasificacion",cursor.getString(1));   //fecha
+                    callableStatement .setString("@fecha_puesta",cursor.getString(2));          //fecha_puesta
+                    callableStatement .setString("@cod_carrito",cursor.getString(3));           //cod_carrito
+                    callableStatement .setString("@tipo_huevo",cursor.getString(4));            //tipo_huevo
+                    callableStatement .setString("@cod_clasificacion",cursor.getString(5));     //cod_clasificacion
+                    callableStatement .setString("@hora_clasificacion",cursor.getString(6));    //hora_clasificacion
+                    callableStatement .setString("@cod_lote",cursor.getString(7));              //cod_lote
+                    callableStatement .setString("@resp_clasificacion",cursor.getString(8));    //resp_clasificacion
+                    callableStatement .setString("@resp_control_calidad",cursor.getString(9));  //resp_control_calidad
+                    callableStatement .setString("@usuario_upd",cursor.getString(10));          //usuario_upd
+                    callableStatement .setString("@u_medida",cursor.getString(11));             //u_medida
+                    callableStatement .setInt(   "@cantidad", Integer.parseInt(cursor.getString(12)));             //cantidad
+                    callableStatement .setString("@clasificadora",cursor.getString(13));        //clasificadora
+                    callableStatement .setString("@clasificadora_actual",cursor.getString(14)); //clasificadora_actual
+                    callableStatement .setString("@empacadora",cursor.getString(15));           //empacadora
+                    callableStatement .setString("@aviario",cursor.getString(16));              //aviario
+                    callableStatement .setString("@tipo_almacenamiento",cursor.getString(17));  //tipo_almacenamiento
+                    callableStatement .setString("@liberado_por",cursor.getString(18));         //liberado_por
+                    callableStatement .setString("@comentario",cursor.getString(19));           //comentario
+                    callableStatement .setString("@codigo_borroso",cursor.getString(20));       //codigo_borroso
+                    callableStatement .setString("@tipo_maples",cursor.getString(21));          //tipo_maples
+                    callableStatement .setString("@codigo_especial",cursor.getString(22));      //codigo_especial
+                    callableStatement .setString("@estado_liberacion",cursor.getString(23));    //estado_liberacion
+                    callableStatement .setString("@estado",cursor.getString(24));               //estado
+                    callableStatement.registerOutParameter("@mensaje", Types.INTEGER);
+                    callableStatement.executeQuery();
+
+                    ResultSet rs;
+
+                    rs = callableStatement.getResultSet();
+                    if (rs.next())
+                    {
+                        tipo_mensaje=(rs.getInt(1));
                     }
+                    if (callableStatement.getMoreResults())
+                    {
+                        rs = callableStatement.getResultSet();
+                        if (rs.next()) {
+                        tipo_mensaje=(rs.getInt(1));
+                        }
+                    }
+                    // detalle_mensaje= callableStatement.getString("@detalle_mensaje");
+                   if(tipo_mensaje>0){
+                        SQLiteDatabase db_upd=conn.getReadableDatabase();
+                        String strSQL = "UPDATE lotes SET  estado_registro="+tipo_mensaje+"  WHERE    cod_interno="+cursor.getString(0)+"";
+                        db_upd.execSQL(strSQL);
+                        db_UPDATE.close();
+                    }
+                }
 
-                })
-                .setNegativeButton("NO", null)
-                .show();
+            }catch(Exception e)
+            {
+
+                String es=e.toString();
+             }
+        }
+
+        public static void consultarListaexportaciones_fallidas(Context context) {
+             SQLiteDatabase db=conn.getReadableDatabase();
+            Exportaciones Exportaciones=null;
+
+             lista_exportaciones_fails=new ArrayList<Exportaciones>();
+
+            Cursor cursor=db.rawQuery("select  a.cod_carrito,b.descripcion,a.cod_interno,a.fecha_puesta,a.fecha,a.cantidad,a.tipo_huevo from lotes a inner join estados_registros b on a.estado_registro=b.id  where a.estado_registro not in(1,2)"   ,null);
+
+            while (cursor.moveToNext()){
+
+                Exportaciones=new Exportaciones();
+                Exportaciones.setcod_carrito(cursor.getString(0));
+                Exportaciones.setestado(cursor.getString(1));
+                Exportaciones.setCod_interno(cursor.getString(2));
+                Exportaciones.setFecha_puesta(cursor.getString(3));
+                Exportaciones.setFecha_clasificacion(cursor.getString(4));
+                Exportaciones.setCantidad(cursor.getString(5));
+                Exportaciones.setTipo_huevo(cursor.getString(6));
+                lista_exportaciones_fails.add(Exportaciones);
+            }
+            cursor.close();
+
+        }
+
+        public static void volver_atras(Context context, Activity activity,Class clase_destino,String texto,int tipo)  {
+
+
+           if(tipo==1){
+               new AlertDialog.Builder(context)
+                       .setIcon(android.R.drawable.ic_dialog_alert)
+                       .setTitle("ATENCION!!!.")
+                       .setMessage(texto)
+                       .setPositiveButton("SI", new DialogInterface.OnClickListener()
+                       {
+                           @Override
+                           public void onClick(DialogInterface dialog, int which) {
+                               Intent intent = new Intent(context, clase_destino);
+                               intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                               activity.finish();
+                               context.startActivity(intent);
+                           }
+
+                       })
+                       .setNegativeButton("NO", null)
+                       .show();
+           }
+           else {
+               Intent intent = new Intent(context, clase_destino);
+               intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+               activity.finish();
+               context.startActivity(intent);
+           }
+        }
+
+        public static void set_fechas(){
+
+        SQLiteDatabase db_consulta=conn.getReadableDatabase();
+        Cursor cursor=db_consulta.rawQuery("SELECT strftime('%d/%m/%Y',date('now'))  as fecha_actual"   ,null);
+        if (cursor.moveToNext()){
+            registro_liberados.txt_fecha_clasificacion.setText(cursor.getString(0));
+            registro_liberados.txt_fecha_puesta.setText(cursor.getString(0));
+            registro_liberados.fecha_registro=cursor.getString(0);
+          }
+        cursor.close();
     }
 
+        public static void Eliminar_registro(int cod_interno) {
+            try {
+                    SQLiteDatabase db_upd=conn.getReadableDatabase();
+                    db_upd.execSQL("UPDATE lotes SET  estado_registro=7  WHERE    cod_interno="+cod_interno+"");
+                    db_upd.close();
+                }
+            catch(Exception e)
+            {
+
+                String es=e.toString();
+            }
+
+
+        }
 
     }
