@@ -91,7 +91,7 @@ public class SpinnerDialog {
         View v = context.getLayoutInflater().inflate(R.layout.dialog_layout, null);
         TextView rippleViewClose = (TextView) v.findViewById(R.id.close);
         TextView title = (TextView) v.findViewById(R.id.spinerTitle);
-        ImageView searchIcon=(ImageView) v.findViewById(R.id.searchIcon);
+       // ImageView searchIcon=(ImageView) v.findViewById(R.id.searchIcon);
         rippleViewClose.setText(closeTitle);
         title.setText(dTitle);
         final ListView listView = (ListView) v.findViewById(R.id.list);
@@ -108,7 +108,7 @@ public class SpinnerDialog {
         title.setTextColor(titleColor);
         searchBox.setTextColor(searchTextColor);
         rippleViewClose.setTextColor(closeColor);
-        searchIcon.setColorFilter(searchIconColor);
+      //  searchIcon.setColorFilter(searchIconColor);
 
 
 //        final ArrayAdapter<String> adapter = new ArrayAdapter<String>(context, R.layout.items_view, items);

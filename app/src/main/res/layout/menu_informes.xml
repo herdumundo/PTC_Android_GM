@@ -31,7 +31,7 @@
         android:layout_marginTop="28dp"
         android:background="@drawable/boton_negro"
         android:drawableLeft="@mipmap/ic_informe"
-        android:onClick="ir_informe_exportacion_fallida"
+        android:onClick="ir_informe_registros"
         android:text="VISUALIZAR REGISTROS"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

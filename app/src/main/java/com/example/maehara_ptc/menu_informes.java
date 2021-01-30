@@ -24,4 +24,10 @@ public class menu_informes extends AppCompatActivity {
         startActivity(i);
         finish();
     }
+
+    public void ir_informe_registros(View v){
+        Intent i=new Intent(this, informes_registros.class);
+        startActivity(i);
+        finish();
+    }
 }

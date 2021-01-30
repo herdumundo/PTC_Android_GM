@@ -23,8 +23,7 @@ import Utilidades.voids;
 import androidx.appcompat.app.AppCompatActivity;
 
 public class MainActivity extends AppCompatActivity {
-    Connection connect;
-     private ProgressDialog progress_sincro;
+    private ProgressDialog progress_sincro;
     TextView txt_usuario,txt_pass;
     String mensaje="";
     @Override
@@ -42,99 +41,7 @@ public class MainActivity extends AppCompatActivity {
         voids.conexion_sqlite(this);
     }
 
-    private void sincronizar_usuarios() {
-        try {
-            borrar_usuario();
-            SQLiteDatabase db=voids.conn.getReadableDatabase();
-            ConnectionHelperGrupomaehara conexion = new  ConnectionHelperGrupomaehara();
-            connect = conexion.Connections();
-            Statement stmt = connect.createStatement();
-            String query = "select * from usuarios where clasificadora in ('A','B','O','H') and rol <> 'i'";
-            ResultSet rs = stmt.executeQuery(query);
-            while ( rs.next())
-            {
 
-                ContentValues values=new ContentValues();
-                values.put("nombre",rs.getString("nombre"));
-                values.put("usuario",rs.getString("usuario"));
-                values.put("password",rs.getString("password"));
-                values.put("cod_usuario",rs.getString("cod_usuario"));
-                values.put("rol",rs.getString("rol"));
-                values.put("clasificadora",rs.getString("clasificadora"));
-                db.insert("usuarios", "cod_usuario",values);
-            }
-            db.close();
-            rs.close();
-            mensaje="PROCESO FINALIZADO CON EXITO";
-        }catch(Exception e){
-            mensaje=e.toString();
-        }}
-    private void sincronizar_empacadoras() {
-        try {
-            borrar_empacadoras();
-            SQLiteDatabase db= voids.conn.getReadableDatabase();
-            ConnectionHelperGrupomaehara conexion = new ConnectionHelperGrupomaehara();
-            connect = conexion.Connections();
-            Statement stmt = connect.createStatement();
-            String query = "select * from huevos_empacadoras where estado='A'";
-            ResultSet rs = stmt.executeQuery(query);
-            while ( rs.next())
-            {
-
-                ContentValues values=new ContentValues();
-                values.put("id",rs.getString("id"));
-                values.put("empacadora",rs.getString("empacadora"));
-                values.put("tipo_huevo",rs.getString("tipo_huevo"));
-                db.insert("empacadoras", "id",values);
-            }
-            db.close();
-            rs.close();
-            mensaje="PROCESO FINALIZADO CON EXITO";
-        }catch(Exception e){
-            mensaje=e.toString();
-        }}
-     private void sincronizar_motivo_retencion() {
-        try {
-            borrar_motivo_retencion();
-            SQLiteDatabase db=voids.conn.getReadableDatabase();
-            ConnectionHelperGrupomaehara conexion = new ConnectionHelperGrupomaehara();
-            connect = conexion.Connections();
-            Statement stmt = connect.createStatement();
-            ResultSet rs = stmt.executeQuery("select * from motivo_retencion  ");
-            while ( rs.next())
-            {
-
-                ContentValues values=new ContentValues();
-                values.put("id",rs.getString("id"));
-                values.put("descripcion",rs.getString("descripcion"));
-                values.put("tipo",rs.getString("tipo"));
-
-                db.insert("motivo_retencion", "id",values);
-            }
-            db.close();
-            rs.close();
-            mensaje="PROCESO FINALIZADO CON EXITO";
-        }catch(Exception e){
-            mensaje=e.toString();
-        }}
-
-
-    private void borrar_usuario(){
-        SQLiteDatabase db1=voids.conn.getReadableDatabase();
-        db1.execSQL("delete from usuarios");
-        db1.close();
-    }
-    private void borrar_motivo_retencion(){
-        SQLiteDatabase db1=voids.conn.getReadableDatabase();
-        db1.execSQL("delete from motivo_retencion");
-        db1.close();
-    }
-
-     private void borrar_empacadoras(){
-        SQLiteDatabase db1=voids.conn.getReadableDatabase();
-        db1.execSQL("delete from empacadoras");
-        db1.close();
-    }
     public void sincronizar(View v){
         new AlertDialog.Builder(MainActivity.this)
                 .setIcon(android.R.drawable.ic_dialog_alert)
@@ -161,21 +68,23 @@ public class MainActivity extends AppCompatActivity {
         public void run() {
 
             try {
-                sincronizar_usuarios();
-                sincronizar_empacadoras();
-                sincronizar_motivo_retencion();
+                voids.sincronizar_usuarios();
+                voids.sincronizar_empacadoras();
+                voids.sincronizar_motivo_retencion();
+                voids.sincronizar_estados();
                 runOnUiThread(new Runnable() {
                     @Override
 
                     public void run() {
-                        Toast.makeText(MainActivity.this, mensaje, Toast.LENGTH_LONG).show();
-                            System.out.println(mensaje);
+                        Toast.makeText(MainActivity.this, voids.mensaje_importador, Toast.LENGTH_LONG).show();
+                            System.out.println(voids.mensaje_importador);
                             progress_sincro.dismiss();
 
                     }
                 });
             } catch ( Exception e) {
-                e.printStackTrace();
+                Toast.makeText(MainActivity.this, e.toString(), Toast.LENGTH_LONG).show();
+                progress_sincro.dismiss();
             }
         }
     }

@@ -30,7 +30,6 @@ import androidx.appcompat.app.AppCompatActivity;
 
 public class menu_principal extends AppCompatActivity {
     public static ProgressDialog prodialog;
-    Connection connect;
     TextView txt_total_pendientes,txt_estado;
     int total,total_pendientes;
     String mensaje="";
@@ -93,15 +92,15 @@ public class menu_principal extends AppCompatActivity {
        try {
             //
             ConnectionHelperGrupomaehara conexion = new ConnectionHelperGrupomaehara();
-            connect = conexion.Connections();
-            Statement stmt3 = connect.createStatement();
+            voids.connect = conexion.Connections();
+            Statement stmt3 = voids.connect.createStatement();
             ResultSet rs3 = stmt3.executeQuery("select count(*) as contador  from  mae_lotes_disponibles_app");
             while (rs3.next()) {
                 total=rs3.getInt("contador");
             }
 
             rs3.close();
-            connect.close();
+           voids.connect.close();
         }catch(Exception e){
         }
 
@@ -177,15 +176,15 @@ public class menu_principal extends AppCompatActivity {
             db_estado.close();
             SQLiteDatabase db=voids.conn.getReadableDatabase();
             ConnectionHelperGrupomaehara conexion = new ConnectionHelperGrupomaehara();
-            connect = conexion.Connections();
+            voids.connect = conexion.Connections();
 
             CallableStatement callableStatement=null;
-            callableStatement = connect.prepareCall("{call mae_cch_insertar_lotes_disponibles_app( ?,?)}");
+            callableStatement = voids.connect.prepareCall("{call mae_cch_insertar_lotes_disponibles_app( ?,?)}");
             callableStatement .setInt("@parametro1",1);
             callableStatement.registerOutParameter("@mensaje", Types.INTEGER);
             callableStatement.execute();
 
-            Statement stmt = connect.createStatement();
+            Statement stmt = voids.connect.createStatement();
             ResultSet rs = stmt.executeQuery("select *  from  mae_lotes_disponibles_app");
 
             int c=0;

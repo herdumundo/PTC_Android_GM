@@ -33,7 +33,7 @@ public class ConexionSQLiteHelper extends SQLiteOpenHelper {
                 "cod_lote TEXT NOT NULL,resp_clasificacion TEXT NOT NULL,resp_control_calidad TEXT NOT NULL,usuario_upd TEXT NOT NULL,u_medida TEXT NOT NULL,cantidad INTEGER NOT NULL," +
                 "clasificadora TEXT NOT NULL,clasificadora_actual TEXT NOT NULL,empacadora TEXT NOT NULL," +
                 "aviario TEXT ,tipo_almacenamiento TEXT,liberado_por TEXT,comentario TEXT,codigo_borroso TEXT,tipo_maples TEXT,codigo_especial TEXT," +
-                "estado_liberacion TEXT,estado TEXT,id_sql_server INTEGER,estado_registro INTEGER)");
+                "estado_liberacion TEXT,estado TEXT,id_sql_server INTEGER,estado_registro INTEGER,codigo_cepillado TEXT)");
 
     }
     @Override

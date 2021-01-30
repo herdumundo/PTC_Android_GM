@@ -11,10 +11,13 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.view.View;
 import android.widget.DatePicker;
+import android.widget.Toast;
 
 import com.example.maehara_ptc.ConexionSQLiteHelper;
 import com.example.maehara_ptc.ConnectionHelperGrupomaehara;
+import com.example.maehara_ptc.MainActivity;
 import com.example.maehara_ptc.R;
+import com.example.maehara_ptc.informes_registros;
 import com.example.maehara_ptc.menu_principal;
 import com.example.maehara_ptc.registro_liberados;
 import com.tapadoo.alerter.Alerter;
@@ -22,6 +25,7 @@ import com.tapadoo.alerter.Alerter;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.ResultSet;
+import java.sql.Statement;
 import java.sql.Types;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
@@ -30,13 +34,12 @@ import java.util.Calendar;
 
     public class voids
     {
-
+    public static String mensaje_importador="";
         public static ConexionSQLiteHelper conn;
-
         public static Connection connect;
 
         public static void conexion_sqlite(Context context) {
-              conn=new ConexionSQLiteHelper(context,"BD_SQLITE_GM",null,2);
+              conn=new ConexionSQLiteHelper(context,"BD_SQLITE_GM",null,3);
 
           }
 
@@ -229,4 +232,163 @@ import java.util.Calendar;
 
         }
 
+        public static void sincronizar_usuarios() {
+            try {
+                SQLiteDatabase db1= conn.getReadableDatabase();
+                db1.execSQL("delete from usuarios");
+                db1.close();
+
+                SQLiteDatabase db= conn.getReadableDatabase();
+                ConnectionHelperGrupomaehara conexion = new  ConnectionHelperGrupomaehara();
+                connect = conexion.Connections();
+                Statement stmt = connect.createStatement();
+                String query = "select * from usuarios where clasificadora in ('A','B','O','H') and rol <> 'i'";
+                ResultSet rs = stmt.executeQuery(query);
+                while ( rs.next())
+                {
+
+                    ContentValues values=new ContentValues();
+                    values.put("nombre",rs.getString("nombre"));
+                    values.put("usuario",rs.getString("usuario"));
+                    values.put("password",rs.getString("password"));
+                    values.put("cod_usuario",rs.getString("cod_usuario"));
+                    values.put("rol",rs.getString("rol"));
+                    values.put("clasificadora",rs.getString("clasificadora"));
+                    db.insert("usuarios", "cod_usuario",values);
+                }
+                db.close();
+                rs.close();
+                mensaje_importador="PROCESO FINALIZADO CON EXITO";
+            }catch(Exception e){
+                mensaje_importador=e.toString();
+            }}
+
+
+        public static void sincronizar_motivo_retencion() {
+            try {
+                SQLiteDatabase db1= conn.getReadableDatabase();
+                db1.execSQL("delete from motivo_retencion");
+                db1.close();
+
+                SQLiteDatabase db= conn.getReadableDatabase();
+                ConnectionHelperGrupomaehara conexion = new ConnectionHelperGrupomaehara();
+                connect = conexion.Connections();
+                Statement stmt = connect.createStatement();
+                ResultSet rs = stmt.executeQuery("select * from motivo_retencion  ");
+                while ( rs.next())
+                {
+
+                    ContentValues values=new ContentValues();
+                    values.put("id",rs.getString("id"));
+                    values.put("descripcion",rs.getString("descripcion"));
+                    values.put("tipo",rs.getString("tipo"));
+
+                    db.insert("motivo_retencion", "id",values);
+                }
+                db.close();
+                rs.close();
+                mensaje_importador="PROCESO FINALIZADO CON EXITO";
+            }catch(Exception e){
+                mensaje_importador=e.toString();
+            }}
+
+
+        public static void sincronizar_empacadoras() {
+            try {
+                SQLiteDatabase db1=conn.getReadableDatabase();
+                db1.execSQL("delete from empacadoras");
+                db1.close();
+
+                SQLiteDatabase db=conn.getReadableDatabase();
+                ConnectionHelperGrupomaehara conexion = new ConnectionHelperGrupomaehara();
+                connect = conexion.Connections();
+                Statement stmt = connect.createStatement();
+                String query = "select * from huevos_empacadoras where estado='A'";
+                ResultSet rs = stmt.executeQuery(query);
+                while ( rs.next())
+                {
+
+                    ContentValues values=new ContentValues();
+                    values.put("id",rs.getString("id"));
+                    values.put("empacadora",rs.getString("empacadora"));
+                    values.put("tipo_huevo",rs.getString("tipo_huevo"));
+                    db.insert("empacadoras", "id",values);
+                }
+                db.close();
+                rs.close();
+                mensaje_importador="PROCESO FINALIZADO CON EXITO";
+            }catch(Exception e){
+                mensaje_importador=e.toString();
+            }}
+
+        public static void sincronizar_estados() {
+            try {
+                SQLiteDatabase db1=conn.getReadableDatabase();
+                db1.execSQL("delete from estados_registros");
+                db1.close();
+
+                SQLiteDatabase db=conn.getReadableDatabase();
+                ConnectionHelperGrupomaehara conexion = new ConnectionHelperGrupomaehara();
+                connect = conexion.Connections();
+                Statement stmt = connect.createStatement();
+                ResultSet rs = stmt.executeQuery("select * from mae_cch_estados_ptc_app");
+                while ( rs.next())
+                {
+
+                    ContentValues values=new ContentValues();
+                    values.put("id",rs.getString("id"));
+                    values.put("descripcion",rs.getString("descripcion"));
+                    db.insert("estados_registros", null,values);
+                }
+                db.close();
+                rs.close();
+                mensaje_importador="PROCESO FINALIZADO CON EXITO";
+            }catch(Exception e){
+                mensaje_importador=e.toString();
+            }}
+
+        public static void llenar_registrados() {
+          try {
+              SQLiteDatabase db=conn.getReadableDatabase();
+              String html="";
+
+              Cursor cursor=db.rawQuery("select  a.cod_carrito,b.descripcion,a.cod_interno,a.fecha_puesta,a.fecha,a.cantidad,a.tipo_huevo,a.empacadora,a.cod_clasificacion,a.hora_clasificacion,a.comentario from lotes a inner join estados_registros b on a.estado_registro=b.id  where a.estado_registro   in(1,2)"   ,null);
+
+              while (cursor.moveToNext()){
+
+                  html=html+  "<tr>" +
+                          "<td>"+cursor.getString(0)+"</td>" +
+                          "<td>"+cursor.getString(3)+"</td>" +
+                          "<td>"+cursor.getString(6)+"</td>" +
+                          "<td>"+cursor.getString(5)+"</td>" +
+                          "<td>"+cursor.getString(1)+"</td>" +
+                          "<td>"+cursor.getString(7)+"</td>" +
+                          "<td>"+cursor.getString(8)+"</td>" +
+                          "<td>"+cursor.getString(9)+"</td>" +
+                          "<td>"+cursor.getString(10)+"</td>" +
+                          "</tr>";
+              }
+              cursor.close();
+              String table = "<table border=1> " +
+                      "<thead> " +
+                      "<tr>" +
+                      "<td>CARRITO</td>" +
+                      "<td>PUESTA</td>" +
+                      "<td>TIPO</td>" +
+                      "<td>CANTIDAD</td>" +
+                      "<td>ESTADO</td>" +
+                      "<td>EMPACADORA</td>" +
+                      "<td>CATEGORIA</td>" +
+                      "<td>HORARIO</td>" +
+                      "<td>COMENTARIO</td>" +
+                      "</tr> </thead><tbody>"+html+" </tbody></table>" ;
+              informes_registros.wv.loadData(table, "text/html", "utf-8");
+          }
+          catch (Exception e){
+              String mens=e.toString();
+
+          }
+
+
+        }
     }

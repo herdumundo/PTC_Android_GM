@@ -619,5 +619,20 @@
         android:textOff="BORROSO NO"
         android:textOn="BORROSO SI" />
 
+    <ToggleButton
+        android:id="@+id/codigo_cepillado"
+        android:layout_width="148dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/btn_fecha_puesta"
+        android:layout_centerHorizontal="true"
+        android:layout_marginStart="75dp"
+        android:layout_marginTop="7dp"
+        android:layout_marginEnd="67dp"
+        android:layout_toStartOf="@+id/codigo_especial"
+        android:layout_toEndOf="@+id/codigo_borroso"
+        android:text="ToggleButton"
+        android:textOff="CEPILLADO NO"
+        android:textOn="CEPILLADO SI" />
+
 
 </RelativeLayout>

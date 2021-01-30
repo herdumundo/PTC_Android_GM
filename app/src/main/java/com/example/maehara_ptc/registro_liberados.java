@@ -43,9 +43,10 @@ public class registro_liberados extends AppCompatActivity {
     public static DatePickerDialog picker;
     public static MultipleSelectionSpinner cbox_empacadora;
     String codigo_borroso="NO";
+    String codigo_cepillado="NO";
     String codigo_especial="NO";
     public static String fecha_registro="";
-    ToggleButton toggle_codigo_borroso,toggle_codigo_especial;
+    ToggleButton toggle_codigo_borroso,toggle_codigo_especial,toggle_codigo_cepillado;
 
     public void onBackPressed()  {
         voids.volver_atras(this,this,menu_principal.class,"DESEA IR AL MENU PRINCIPAL?",1);
@@ -76,6 +77,7 @@ public class registro_liberados extends AppCompatActivity {
         btn_fecha_puesta        =   findViewById(R.id.btn_fecha_puesta);
         btnEscanear             =   findViewById(R.id.btnEscanear);
         toggle_codigo_borroso   =   findViewById(R.id.codigo_borroso);
+        toggle_codigo_cepillado   =   findViewById(R.id.codigo_cepillado);
         toggle_codigo_especial  =   findViewById(R.id.codigo_especial);
         cbox_empacadora         = (MultipleSelectionSpinner)  findViewById(R.id.cbox_empacadora);
         voids.conexion_sqlite(this);
@@ -123,6 +125,19 @@ public class registro_liberados extends AppCompatActivity {
                 }
             }
         });
+        toggle_codigo_cepillado.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(toggle_codigo_cepillado.isChecked())
+                {
+                    codigo_cepillado="SI";
+                }
+                else {
+                    codigo_cepillado="NO";
+                }
+            }
+        });
+
         txt_tipo_maples.setOnClickListener(new View.OnClickListener() {  @Override
         public void onClick(View v) {
             spinner_tipo_maples.showSpinerDialog();
@@ -427,13 +442,14 @@ public class registro_liberados extends AppCompatActivity {
                 values.put("codigo_especial",codigo_especial);
                 values.put("estado_liberacion","L");
                 values.put("estado","A");
+                values.put("codigo_cepillado",codigo_cepillado);
                 values.put("estado_registro",1);//PENDIENTE
                 db.insert("lotes", "cod_interno",values);
 
                 new AlertDialog.Builder( this)
                         .setTitle("INFORME!!!")
                         .setCancelable(false)
-                        .setMessage("REGISTRADO CON EXITO"+txt_carro.getText().toString().length())
+                        .setMessage("REGISTRADO CON EXITO")
                         .setPositiveButton("OK", new DialogInterface.OnClickListener()  {
                             public void onClick(DialogInterface dialog, int id) {
                                 finish();
