@@ -152,8 +152,6 @@ public class registro_liberados extends AppCompatActivity {
             }
         });
 
-
-
         txt_hora_fin.setOnClickListener(new View.OnClickListener() {  @Override
         public void onClick(View v) {
             spinner_hora_fin.showSpinerDialog();
@@ -300,6 +298,16 @@ public class registro_liberados extends AppCompatActivity {
     }
 
     public void registrar_liberados(View v){
+
+
+
+
+
+
+
+
+
+
         try {
 
             SQLiteDatabase db_consulta=voids.conn.getReadableDatabase();

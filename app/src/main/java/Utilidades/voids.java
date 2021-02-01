@@ -63,8 +63,11 @@ import java.util.Calendar;
                             if (tipo==1){
                                 registro_liberados.txt_fecha_clasificacion.setText( df.format((dayOfMonth))+ "/" + df.format((monthOfYear + 1))  + "/" +year );
                             }
-                            else{
+                            else if (tipo==2){
                                 registro_liberados.txt_fecha_puesta.setText( df.format((dayOfMonth))+ "/" + df.format((monthOfYear + 1))  + "/" +year );
+                            }
+                            else if(tipo==3){
+                                informes_registros.txt_calendario.setText( df.format((dayOfMonth))+ "/" + df.format((monthOfYear + 1))  + "/" +year );
                                 }
                         }
 
@@ -347,12 +350,14 @@ import java.util.Calendar;
                 mensaje_importador=e.toString();
             }}
 
-        public static void llenar_registrados() {
+        public static void llenar_registrados(String fecha) {
           try {
               SQLiteDatabase db=conn.getReadableDatabase();
               String html="";
 
-              Cursor cursor=db.rawQuery("select  a.cod_carrito,b.descripcion,a.cod_interno,a.fecha_puesta,a.fecha,a.cantidad,a.tipo_huevo,a.empacadora,a.cod_clasificacion,a.hora_clasificacion,a.comentario from lotes a inner join estados_registros b on a.estado_registro=b.id  where a.estado_registro   in(1,2)"   ,null);
+              Cursor cursor=db.rawQuery("select  a.cod_carrito,b.descripcion,a.cod_interno,a.fecha_puesta,a.fecha," +
+                      "a.cantidad,a.tipo_huevo,a.empacadora,a.cod_clasificacion,a.hora_clasificacion,a.comentario,a.u_medida, case a.tipo_huevo when 'G' then a.cantidad /180 else a.cantidad/360 end as catidad_tipos " +
+                      "from lotes a inner join estados_registros b on a.estado_registro=b.id  where a.estado_registro   in(1,2) and fecha='"+fecha+"'"   ,null);
 
               while (cursor.moveToNext()){
 
@@ -360,7 +365,8 @@ import java.util.Calendar;
                           "<td>"+cursor.getString(0)+"</td>" +
                           "<td>"+cursor.getString(3)+"</td>" +
                           "<td>"+cursor.getString(6)+"</td>" +
-                          "<td>"+cursor.getString(5)+"</td>" +
+                          "<td>"+cursor.getString(11)+"</td>" +
+                          "<td>"+cursor.getString(12)+"</td>" +
                           "<td>"+cursor.getString(1)+"</td>" +
                           "<td>"+cursor.getString(7)+"</td>" +
                           "<td>"+cursor.getString(8)+"</td>" +
@@ -375,6 +381,7 @@ import java.util.Calendar;
                       "<td>CARRITO</td>" +
                       "<td>PUESTA</td>" +
                       "<td>TIPO</td>" +
+                      "<td>U. MEDIDA</td>" +
                       "<td>CANTIDAD</td>" +
                       "<td>ESTADO</td>" +
                       "<td>EMPACADORA</td>" +
@@ -382,6 +389,8 @@ import java.util.Calendar;
                       "<td>HORARIO</td>" +
                       "<td>COMENTARIO</td>" +
                       "</tr> </thead><tbody>"+html+" </tbody></table>" ;
+
+            //  String url="file:///android_asset/index.html";
               informes_registros.wv.loadData(table, "text/html", "utf-8");
           }
           catch (Exception e){
