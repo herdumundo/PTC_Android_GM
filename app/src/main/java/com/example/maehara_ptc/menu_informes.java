@@ -10,7 +10,7 @@ import android.view.View;
 public class menu_informes extends AppCompatActivity {
     @Override
     public void onBackPressed() {
-             voids.volver_atras(this,this,menu_principal.class,"DESEA IR AL MENU PRINCIPAL?",2);
+             voids.volver_atras(this,this,menu_principal.class,"DESEA IR AL MENU PRINCIPAL?",1);
         }
 
     @Override

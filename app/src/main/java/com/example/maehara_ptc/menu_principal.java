@@ -29,13 +29,11 @@ import androidx.appcompat.app.AppCompatActivity;
 
 
 public class menu_principal extends AppCompatActivity {
-    public static ProgressDialog prodialog;
-    TextView txt_total_pendientes,txt_estado;
-    int total,total_pendientes;
-    String mensaje="";
-    int color_mensaje=0;
-    private volatile boolean flag = true;
-    String mensaje_importacion="";
+    public static ProgressDialog prodialog,progress_export;
+    public static TextView txt_total_pendientes,txt_estado;
+    public static int total,total_pendientes;
+
+    public static String mensaje_importacion="";
     public void onBackPressed()  {
         voids.volver_atras(this,this,MainActivity.class,"DESEA SALIR DE LA APLICACION?",1);
       }
@@ -47,58 +45,44 @@ public class menu_principal extends AppCompatActivity {
         getSupportActionBar().setSubtitle("AREA: "+ contenedor_usuario.area);
         txt_total_pendientes=(TextView)findViewById(R.id.txt_total);
         txt_estado=(TextView)findViewById(R.id.txt_estado);
-        pendientes();
+        voids.pendientes();
         voids.conexion_sqlite(this);
-
-        final T_pendientes thread = new T_pendientes();
-        thread.start();
 
     }
 
     public void ir_liberados(View v){
-        flag=false;
+         voids.hilo_sincro=false;
+        System.out.println("SE CERRO EL HILO DE PENDIENTES.");
         Intent i=new Intent(this, registro_liberados.class);
         startActivity(i);
         finish();
     }
 
     public void ir_menu_informes(View v){
-        flag=false;
+         voids.hilo_sincro=false;
+        System.out.println("SE CERRO EL HILO DE PENDIENTES.");
         Intent i=new Intent(this, menu_informes.class);
         startActivity(i);
         finish();
     }
-    private void pendientes()
-    {
-        try {
-            SQLiteDatabase db=voids.conn.getReadableDatabase();
-            Cursor cursor=db.rawQuery("SELECT  count(*)  FROM lotes where   estado_registro =1  " ,null);
-            while (cursor.moveToNext())
-            {
-                total_pendientes=cursor.getInt(0);
-            }
-            txt_total_pendientes.setText(String.valueOf(total_pendientes));
-        }catch(Exception e)
-        {
-        }
-    }
-    public void exportar (View view){
 
-        exportar_datos();
+    public void exportar (View view){
+        progress_export = ProgressDialog.show(menu_principal.this, "EXPORTANDO DATOS REGISTRADOS.",
+                "ESPERE...", true);
+        final voids.T_exportar_regist_menu_principal t_exportar = new voids.T_exportar_regist_menu_principal();
+        t_exportar.start();
     }
 
     public void sincro (View view){
 
        try {
             //
-            ConnectionHelperGrupomaehara conexion = new ConnectionHelperGrupomaehara();
-            voids.connect = conexion.Connections();
+            voids.connect = voids.conexion.Connections();
             Statement stmt3 = voids.connect.createStatement();
             ResultSet rs3 = stmt3.executeQuery("select count(*) as contador  from  mae_lotes_disponibles_app");
             while (rs3.next()) {
                 total=rs3.getInt("contador");
             }
-
             rs3.close();
            voids.connect.close();
         }catch(Exception e){
@@ -139,24 +123,26 @@ public class menu_principal extends AppCompatActivity {
                         prodialog.show();
                         prodialog.setCanceledOnTouchOutside(false);
                         prodialog.setCancelable(false);
-                        new menu_principal.t_lotes().start();
+                        new menu_principal.t_impotar_lotes().start();
 
                     }
                 })
                 .setNegativeButton("NO", null)
                 .show();
     }
-    class t_lotes extends Thread {
+
+    class t_impotar_lotes extends Thread {
         @Override
         public void run() {
-
             try {
-                importar_lotes();
+                voids.importar_lotes(menu_principal.this,2);
+                System.out.println("EL IMPORTADOR SE EJECUTO");
                 runOnUiThread(new Runnable() {
                     @Override
 
                     public void run() {
                         prodialog.dismiss();
+
                         new AlertDialog.Builder( menu_principal.this)
                                 .setTitle("ATENCION!")
                                 .setMessage(mensaje_importacion)
@@ -169,108 +155,12 @@ public class menu_principal extends AppCompatActivity {
         }
     }
 
-    private void importar_lotes() {
-        try {
-            SQLiteDatabase db_estado=voids.conn.getReadableDatabase();
-            db_estado.execSQL("DELETE FROM lotes_sql ");
-            db_estado.close();
-            SQLiteDatabase db=voids.conn.getReadableDatabase();
-            ConnectionHelperGrupomaehara conexion = new ConnectionHelperGrupomaehara();
-            voids.connect = conexion.Connections();
-
-            CallableStatement callableStatement=null;
-            callableStatement = voids.connect.prepareCall("{call mae_cch_insertar_lotes_disponibles_app( ?,?)}");
-            callableStatement .setInt("@parametro1",1);
-            callableStatement.registerOutParameter("@mensaje", Types.INTEGER);
-            callableStatement.execute();
-
-            Statement stmt = voids.connect.createStatement();
-            ResultSet rs = stmt.executeQuery("select *  from  mae_lotes_disponibles_app");
-
-            int c=0;
-
-            while (rs.next())
-            {
-                ContentValues values=new ContentValues();
-                values.put("cod_interno",rs.getString("cod_interno"));
-                values.put("tipo_huevo",rs.getString("tipo_huevo"));
-                values.put("cod_carrito",rs.getString("cod_carrito"));
-                values.put("cod_lote",rs.getString("cod_lote"));
-                values.put("cantidad",rs.getString("cantidad"));
-                values.put("fecha_puesta",rs.getString("fecha_puesta"));
-                values.put("estado_liberacion",rs.getString("estado_liberacion"));
-                values.put("clasificadora",rs.getString("clasificadora"));
-
-                db.insert("lotes_sql", null,values);
-                c++;
-                prodialog.setProgress(c);
-            }
-
-            db.close();
-            rs.close();
-            voids.conn.close();
-            mensaje_importacion="LOTES ACTUALIZADOS CORRECTAMENTE.";
-        }catch(Exception e){
-            mensaje_importacion=e.toString();
-        }}
 
 
-    private  void test_conexion(){
-        conexion c = new conexion();
-
-        if(c.getConexion()!=null){
-            try {
 
 
-                pendientes();
-                mensaje="EN LINEA";
-                color_mensaje=0xFF00FF00;
-                System.out.println("EN LINEA");
-
-            }catch(Exception e)
-            {
-                mensaje=e.toString();
-            }
-
-        }
-        else {
-            pendientes();
-            mensaje="SIN CONEXION";
-            color_mensaje=0xFFFF0000;
-            System.out.println("SIN CONEXION AL SERVER");
-        }
-    }
-
-    class T_pendientes extends Thread
-    {
-
-        @Override
-        public void run()
-        {  while (flag)
-        {
-            try {
-
-                Thread.sleep((long) 5000);
-                test_conexion();
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        //   System.out.println("CONECTADO");
-
-                        txt_estado.setText(mensaje);
-                        txt_estado.setTextColor(color_mensaje);
-                        txt_total_pendientes.setText(String.valueOf(total_pendientes));
-                     }
-                });
-
-            } catch (InterruptedException e) {
-            }
-        }
-
-        }
-    }
 
     private void exportar_datos(){
-        voids.exportar(this,0,1);
+        voids.exportar( 0,1);
     }
 }

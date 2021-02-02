@@ -53,7 +53,7 @@ public class lista_exportaciones_fallidas extends AppCompatActivity {
                                         .setPositiveButton("SI", new DialogInterface.OnClickListener() {
                                             public void onClick(DialogInterface dialog, int id) {
 
-                                                voids.exportar(lista_exportaciones_fallidas.this,Integer.parseInt(voids.lista_exportaciones_fails.get(pos).getCod_interno()),2);
+                                                voids.exportar( Integer.parseInt(voids.lista_exportaciones_fails.get(pos).getCod_interno()),2);
                                                 llenar_grilla();
                                                 dialog.cancel();
                                             }

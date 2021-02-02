@@ -35,6 +35,7 @@ public class registro_liberados extends AppCompatActivity {
     private boolean permisoCamaraConcedido = false, permisoSolicitadoDesdeBoton = false;
     public static SpinnerDialog spinner_tipo_maples,    spinner_tipo_huevo,     spinner_u_medida,
                                 spinner_hora_inicio,    spinner_hora_fin,       spinner_tipo_aviario,spinner_cantidades;
+
     public static TextView  txt_fecha_clasificacion,txt_fecha_puesta,           txt_tipo_maples,    txt_tipo_huevo,
                             txt_u_medida,           txt_carro,                  txt_hora_inicio,    txt_hora_fin,
                             txt_tipo_aviario,       txt_responsable,            txt_cantidad,       txt_liberado_por,
@@ -47,6 +48,9 @@ public class registro_liberados extends AppCompatActivity {
     String codigo_especial="NO";
     public static String fecha_registro="";
     ToggleButton toggle_codigo_borroso,toggle_codigo_especial,toggle_codigo_cepillado;
+    int CantidadUMedida=0;
+    String u_medida=null;
+    int cantidad_val=0;
 
     public void onBackPressed()  {
         voids.volver_atras(this,this,menu_principal.class,"DESEA IR AL MENU PRINCIPAL?",1);
@@ -77,7 +81,7 @@ public class registro_liberados extends AppCompatActivity {
         btn_fecha_puesta        =   findViewById(R.id.btn_fecha_puesta);
         btnEscanear             =   findViewById(R.id.btnEscanear);
         toggle_codigo_borroso   =   findViewById(R.id.codigo_borroso);
-        toggle_codigo_cepillado   =   findViewById(R.id.codigo_cepillado);
+        toggle_codigo_cepillado =   findViewById(R.id.codigo_cepillado);
         toggle_codigo_especial  =   findViewById(R.id.codigo_especial);
         cbox_empacadora         = (MultipleSelectionSpinner)  findViewById(R.id.cbox_empacadora);
         voids.conexion_sqlite(this);
@@ -88,7 +92,6 @@ public class registro_liberados extends AppCompatActivity {
         contenedores_arrays.cargar_empacadoras();
         verificarYPedirPermisosDeCamara();
         voids.set_fechas();
-
         btnEscanear.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -137,7 +140,6 @@ public class registro_liberados extends AppCompatActivity {
                 }
             }
         });
-
         txt_tipo_maples.setOnClickListener(new View.OnClickListener() {  @Override
         public void onClick(View v) {
             spinner_tipo_maples.showSpinerDialog();
@@ -299,193 +301,210 @@ public class registro_liberados extends AppCompatActivity {
 
     public void registrar_liberados(View v){
 
-
-
-
-
-
-
-
-
-
-        try {
-
-            SQLiteDatabase db_consulta=voids.conn.getReadableDatabase();
-            Cursor cursor=db_consulta.rawQuery("SELECT  *  FROM lotes where  cod_carrito='"+txt_carro.getText().toString()+"'  " ,null);
-            if (cursor.moveToNext())
-            {
-                Alerter.create(this)
-                        .setTitle("ATENCION!")
-                        .setText("CODIGO DE CARRO EXISTENTE ")
-                        .setDuration(10000)
-                        .setBackgroundColor(R.color.viewfinder_laser)
-                        .show();
-            }
-            else if(Date.parse(fecha_registro)<Date.parse(txt_fecha_clasificacion.getText().toString()))
-            {
-                Alerter.create(this)
-                        .setTitle("ATENCION!")
-                        .setText("ERROR, FECHA DE CLASIFICACION ES MAYOR A LA FECHA DE HOY")
-                        .setDuration(10000)
-                        .setBackgroundColor(R.color.viewfinder_laser)
-                        .show();
-            }
-            else if(Date.parse(fecha_registro)<Date.parse(txt_fecha_puesta.getText().toString()))
-            {
-                Alerter.create(this)
-                        .setTitle("ATENCION!")
-                        .setText("ERROR, FECHA DE PUESTA ES MAYOR A LA FECHA DE HOY")
-                        .setDuration(10000)
-                        .setBackgroundColor(R.color.viewfinder_laser)
-                        .show();
-            }
-            else if(Date.parse(txt_fecha_clasificacion.getText().toString())<Date.parse(txt_fecha_puesta.getText().toString()))
-            {
-                Alerter.create(this)
-                        .setTitle("ATENCION!")
-                        .setText("ERROR, FECHA DE CLASIFICACION NO PUEDE SER MENOR A LA FECHA DE PUESTA")
-                        .setDuration(10000)
-                        .setBackgroundColor(R.color.viewfinder_laser)
-                        .show();
-            }
-            else if (txt_carro.getText().toString().trim().length()==0||txt_fecha_puesta.getText().toString().trim().length()==0||txt_fecha_clasificacion.getText().toString().trim().length()==0
-                    ||txt_tipo_huevo.getText().toString().trim().length()==0||txt_tipo_aviario.getText().toString().trim().length()==0
-                    ||txt_tipo_maples.getText().toString().trim().length()==0||txt_hora_inicio.getText().toString().trim().length()==0||txt_hora_fin.getText().toString().trim().length()==0
-                    ||txt_u_medida.getText().toString().trim().length()==0||txt_cantidad.getText().toString().trim().length()==0||txt_responsable.getText().toString().trim().length()==0
-                    ||txt_liberado_por.getText().toString().trim().length()==0)
-            {
-                Alerter.create(this)
-                        .setTitle("ATENCION!")
-                        .setText("DEBE COMPLETAR LOS DATOS REQUERIDOS. ")
-                        .setDuration(10000)
-                        .setBackgroundColor(R.color.viewfinder_laser)
-                        .show();
-            }
-            else if (txt_carro.getText().toString().length()!=6){
-                Alerter.create(this)
-                        .setTitle("ATENCION!")
-                        .setText("NRO. DE CARRO NO VALIDO. ")
-                        .setDuration(10000)
-                        .setBackgroundColor(R.color.viewfinder_laser)
-                        .show();
-
-            }
-            else if (txt_carro.getText().toString().substring(0,1).equals("6")||txt_carro.getText().toString().substring(0,1).equals("9")){
-
-
-
-
-
-                String cod_carrito_codigo=null;
-                int CantidadUMedida=0;
-                String u_medida=null;
-                String tipo_almacenamiento="";
-
-                if(txt_carro.getText().toString().substring(0,1).equals("6")){
-                    tipo_almacenamiento="C";
-                }
-                else if(txt_carro.getText().toString().substring(0,1).equals("9")){
-                    tipo_almacenamiento="P";
-                }
-
-                if(txt_tipo_huevo.getText().toString().equals("A")){
-                    cod_carrito_codigo="4";
-                }
-                else if(txt_tipo_huevo.getText().toString().equals("B")){
-                    cod_carrito_codigo="5";
-                }
-                else if(txt_tipo_huevo.getText().toString().equals("C")){
-                    cod_carrito_codigo="6";
-                }
-                else if(txt_tipo_huevo.getText().toString().equals("4TA")){
-                    cod_carrito_codigo="7";
-                }
-                else if(txt_tipo_huevo.getText().toString().equals("S")){
-                    cod_carrito_codigo="3";
-                }
-                else if(txt_tipo_huevo.getText().toString().equals("J")){
-                    cod_carrito_codigo="2";
-                }
-                else if(txt_tipo_huevo.getText().toString().equals("G")){
-                    cod_carrito_codigo="1";
-                }
-                if(txt_u_medida.equals("CAJON GIGANTE"))
-                {
-                    CantidadUMedida= Integer.parseInt(txt_cantidad.getText().toString())*180;
-                    u_medida="CAJ";
-                }
-                else if(txt_u_medida.equals("CAJON"))
-                {
-                    CantidadUMedida= Integer.parseInt(txt_cantidad.getText().toString())*360;
-                    u_medida="CAJ";
-                }
-                else
-                {
-                    CantidadUMedida= 4320;
-                    u_medida="CAR";
-                }
-                SQLiteDatabase db=voids.conn.getReadableDatabase();
-                ContentValues values=new ContentValues();
-                values.put("fecha",txt_fecha_clasificacion.getText().toString());
-                values.put("fecha_puesta",txt_fecha_puesta.getText().toString());
-                values.put("cod_carrito",txt_carro.getText().toString());
-                values.put("tipo_huevo",txt_tipo_huevo.getText().toString());
-                values.put("cod_clasificacion", contenedor_usuario.categoria);
-                values.put("hora_clasificacion",txt_hora_inicio.getText().toString()+"-"+txt_hora_fin.getText().toString());
-                values.put("cod_lote",txt_carro.getText().toString()+"_"+txt_fecha_puesta.getText().toString().replaceAll("/","")+"_"+ contenedor_usuario.categoria+"_"+cod_carrito_codigo);
-                values.put("resp_clasificacion",txt_responsable.getText().toString());
-                values.put("resp_control_calidad", contenedor_usuario.nombre_usuario);
-                values.put("usuario_upd", contenedor_usuario.usuario);
-                values.put("u_medida",u_medida);
-                values.put("cantidad",CantidadUMedida);
-                values.put("clasificadora", contenedor_usuario.area);
-                values.put("clasificadora_actual", contenedor_usuario.area);
-                values.put("empacadora",cbox_empacadora.getSelectedItemsAsString());
-                values.put("aviario",txt_tipo_aviario.getText().toString());
-                values.put("tipo_almacenamiento",tipo_almacenamiento);
-                values.put("liberado_por",txt_liberado_por.getText().toString());
-                values.put("comentario",txt_comentario.getText().toString());
-                values.put("codigo_borroso",codigo_borroso);
-                values.put("tipo_maples",txt_tipo_maples.getText().toString());
-                values.put("codigo_especial",codigo_especial);
-                values.put("estado_liberacion","L");
-                values.put("estado","A");
-                values.put("codigo_cepillado",codigo_cepillado);
-                values.put("estado_registro",1);//PENDIENTE
-                db.insert("lotes", "cod_interno",values);
-
-                new AlertDialog.Builder( this)
-                        .setTitle("INFORME!!!")
-                        .setCancelable(false)
-                        .setMessage("REGISTRADO CON EXITO")
-                        .setPositiveButton("OK", new DialogInterface.OnClickListener()  {
-                            public void onClick(DialogInterface dialog, int id) {
-                                finish();
-                                Intent i=new Intent(registro_liberados.this,menu_principal.class);
-                                startActivity(i);
-                            }
-                        }).show();
-            }
-            else {
-
-                new AlertDialog.Builder(this)
-                        .setTitle("ATENCION!!!")
-                        .setMessage("NRO. DE CARRO NO VALIDO.").show();
-            }
+        if(txt_u_medida.getText().toString().equals("CAJON GIGANTE"))
+        {
+            CantidadUMedida= Integer.parseInt(txt_cantidad.getText().toString())*180;
+            u_medida="CAJ";
+            cantidad_val=Integer.parseInt(txt_cantidad.getText().toString());
+        }
+        else if(txt_u_medida.getText().toString().equals("CAJON"))
+        {
+            CantidadUMedida= Integer.parseInt(txt_cantidad.getText().toString())*360;
+            u_medida="CAJ";
+            cantidad_val=Integer.parseInt(txt_cantidad.getText().toString());
 
         }
-        catch (Exception e){
-            new AlertDialog.Builder(this)
-                    .setTitle("ATENCION!!!")
-                    .setMessage(e.toString()).show();
+        else
+        {
+            CantidadUMedida= 4320;
+            u_medida="CAR";
+            cantidad_val=12;
         }
+ new AlertDialog.Builder(this)
+                       .setIcon(android.R.drawable.ic_dialog_alert)
+                       .setTitle("ATENCION!!!.")
+                       .setMessage("DESEA REGISTRAR LOS DATOS INGRESADOS?")
+                       .setPositiveButton("SI", new DialogInterface.OnClickListener()
+                       {
+                           @Override
+                           public void onClick(DialogInterface dialog, int which) {
+                               try {
+                                   int cantidad_existente=0;
+                                   SQLiteDatabase db_consulta=voids.conn.getReadableDatabase();
+                                   Cursor cursor=db_consulta.rawQuery(" select sum(cantidad) from (select case tipo_huevo when 'G' then cantidad/180 else   cantidad/360 end as cantidad ,cod_carrito" +
+                                           "                    from lotes where estado_registro=1 " +
+                                           "union all select case tipo_huevo when 1 then cantidad/180 else   cantidad/360 end as cantidad,cod_carrito  from lotes_sql  order by 2) " +
+                                           "where cod_carrito="+txt_carro.getText().toString().trim()+" " ,null);
+                                   if (cursor.moveToNext())
+                                   {
+                                       cantidad_existente=cursor.getInt(0);
+                                   }
 
-    }
 
-    public static registro_liberados newInstance() {
-        registro_liberados fragment = new registro_liberados();
-        return fragment;
-    }
+                                   if ((cantidad_existente+cantidad_val)>12)
+                                   {
+                                       Alerter.create(registro_liberados.this)
+                                               .setTitle("ATENCION, CANTIDAD EXCEDIDA")
+                                               .setText("CAJONES REGISTRADOS:"+cantidad_existente+"")
+                                               .setDuration(10000)
+                                               .setBackgroundColor(R.color.viewfinder_laser)
+                                               .show();
+                                   }
+
+                                   else if(Date.parse(fecha_registro)<Date.parse(txt_fecha_clasificacion.getText().toString()))
+                                   {
+                                       Alerter.create(registro_liberados.this)
+                                               .setTitle("ATENCION!")
+                                               .setText("ERROR, FECHA DE CLASIFICACION ES MAYOR A LA FECHA DE HOY")
+                                               .setDuration(10000)
+                                               .setBackgroundColor(R.color.viewfinder_laser)
+                                               .show();
+                                   }
+                                   else if(Date.parse(fecha_registro)<Date.parse(txt_fecha_puesta.getText().toString()))
+                                   {
+                                       Alerter.create(registro_liberados.this)
+                                               .setTitle("ATENCION!")
+                                               .setText("ERROR, FECHA DE PUESTA ES MAYOR A LA FECHA DE HOY")
+                                               .setDuration(10000)
+                                               .setBackgroundColor(R.color.viewfinder_laser)
+                                               .show();
+                                   }
+                                   else if(Date.parse(txt_fecha_clasificacion.getText().toString())<Date.parse(txt_fecha_puesta.getText().toString()))
+                                   {
+                                       Alerter.create(registro_liberados.this)
+                                               .setTitle("ATENCION!")
+                                               .setText("ERROR, FECHA DE CLASIFICACION NO PUEDE SER MENOR A LA FECHA DE PUESTA")
+                                               .setDuration(10000)
+                                               .setBackgroundColor(R.color.viewfinder_laser)
+                                               .show();
+                                   }
+                                   else if (txt_carro.getText().toString().trim().length()==0||txt_fecha_puesta.getText().toString().trim().length()==0||txt_fecha_clasificacion.getText().toString().trim().length()==0
+                                           ||txt_tipo_huevo.getText().toString().trim().length()==0||txt_tipo_aviario.getText().toString().trim().length()==0
+                                           ||txt_tipo_maples.getText().toString().trim().length()==0||txt_hora_inicio.getText().toString().trim().length()==0||txt_hora_fin.getText().toString().trim().length()==0
+                                           ||txt_u_medida.getText().toString().trim().length()==0||txt_cantidad.getText().toString().trim().length()==0||txt_responsable.getText().toString().trim().length()==0
+                                           ||txt_liberado_por.getText().toString().trim().length()==0)
+                                   {
+                                       Alerter.create(registro_liberados.this)
+                                               .setTitle("ATENCION!")
+                                               .setText("DEBE COMPLETAR LOS DATOS REQUERIDOS. ")
+                                               .setDuration(10000)
+                                               .setBackgroundColor(R.color.viewfinder_laser)
+                                               .show();
+                                   }
+                                   else if (txt_carro.getText().toString().length()!=6){
+                                       Alerter.create(registro_liberados.this)
+                                               .setTitle("ATENCION!")
+                                               .setText("NRO. DE CARRO NO VALIDO. ")
+                                               .setDuration(10000)
+                                               .setBackgroundColor(R.color.viewfinder_laser)
+                                               .show();
+
+                                   }
+                                   else if (txt_carro.getText().toString().substring(0,1).equals("6")||txt_carro.getText().toString().substring(0,1).equals("9")){
+
+                                       String tipo_almacenamiento="";
+                                       String cod_carrito_codigo=null;
+
+                                       if(txt_carro.getText().toString().substring(0,1).equals("6")){
+                                           tipo_almacenamiento="C";
+                                       }
+                                       else if(txt_carro.getText().toString().substring(0,1).equals("9")){
+                                           tipo_almacenamiento="P";
+                                       }
+
+                                       if(txt_tipo_huevo.getText().toString().equals("A")){
+                                           cod_carrito_codigo="4";
+                                       }
+                                       else if(txt_tipo_huevo.getText().toString().equals("B")){
+                                           cod_carrito_codigo="5";
+                                       }
+                                       else if(txt_tipo_huevo.getText().toString().equals("C")){
+                                           cod_carrito_codigo="6";
+                                       }
+                                       else if(txt_tipo_huevo.getText().toString().equals("4TA")){
+                                           cod_carrito_codigo="7";
+                                       }
+                                       else if(txt_tipo_huevo.getText().toString().equals("S")){
+                                           cod_carrito_codigo="3";
+                                       }
+                                       else if(txt_tipo_huevo.getText().toString().equals("J")){
+                                           cod_carrito_codigo="2";
+                                       }
+                                       else if(txt_tipo_huevo.getText().toString().equals("G")){
+                                           cod_carrito_codigo="1";
+                                       }
+
+                                       SQLiteDatabase db=voids.conn.getReadableDatabase();
+                                       ContentValues values=new ContentValues();
+                                       values.put("fecha",txt_fecha_clasificacion.getText().toString());
+                                       values.put("fecha_puesta",txt_fecha_puesta.getText().toString());
+                                       values.put("cod_carrito",txt_carro.getText().toString());
+                                       values.put("tipo_huevo",txt_tipo_huevo.getText().toString());
+                                       values.put("cod_clasificacion", contenedor_usuario.categoria);
+                                       values.put("hora_clasificacion",txt_hora_inicio.getText().toString()+"-"+txt_hora_fin.getText().toString());
+                                       values.put("cod_lote",txt_carro.getText().toString()+"_"+txt_fecha_puesta.getText().toString().replaceAll("/","")+"_"+ contenedor_usuario.categoria+"_"+cod_carrito_codigo);
+                                       values.put("resp_clasificacion",txt_responsable.getText().toString());
+                                       values.put("resp_control_calidad", contenedor_usuario.nombre_usuario);
+                                       values.put("usuario_upd", contenedor_usuario.usuario);
+                                       values.put("u_medida",u_medida);
+                                       values.put("cantidad",CantidadUMedida);
+                                       values.put("clasificadora", contenedor_usuario.area);
+                                       values.put("clasificadora_actual", contenedor_usuario.area);
+                                       values.put("empacadora",cbox_empacadora.getSelectedItemsAsString());
+                                       values.put("aviario",txt_tipo_aviario.getText().toString());
+                                       values.put("tipo_almacenamiento",tipo_almacenamiento);
+                                       values.put("liberado_por",txt_liberado_por.getText().toString());
+                                       values.put("comentario",txt_comentario.getText().toString());
+                                       values.put("codigo_borroso",codigo_borroso);
+                                       values.put("tipo_maples",txt_tipo_maples.getText().toString());
+                                       values.put("codigo_especial",codigo_especial);
+                                       values.put("estado_liberacion","L");
+                                       values.put("estado","A");
+                                       values.put("codigo_cepillado",codigo_cepillado);
+                                       values.put("estado_registro",1);//PENDIENTE
+                                       db.insert("lotes", "cod_interno",values);
+                                       voids.hilo_exportar=true;
+
+                                       final voids.T_exportar_regist t_exportar = new voids.T_exportar_regist();
+                                       t_exportar.start();
+
+                                       new AlertDialog.Builder( registro_liberados.this)
+                                               .setTitle("INFORME!!!")
+                                               .setCancelable(false)
+                                               .setMessage("REGISTRADO CON EXITO")
+                                               .setPositiveButton("OK", new DialogInterface.OnClickListener()  {
+                                                   public void onClick(DialogInterface dialog, int id) {
+
+                                                       Intent i=new Intent(registro_liberados.this,menu_principal.class);
+                                                       startActivity(i);
+
+                                                       finish();
+                                                   }
+                                               }).show();
+                                   }
+                                   else {
+
+                                       new AlertDialog.Builder(registro_liberados.this)
+                                               .setTitle("ATENCION!!!")
+                                               .setMessage("NRO. DE CARRO NO VALIDO.").show();
+                                   }
+
+                               }
+                               catch (Exception e){
+                                   new AlertDialog.Builder(registro_liberados.this)
+                                           .setTitle("ATENCION!!!")
+                                           .setMessage(e.toString()).show();
+                               }
+
+                           }
+
+                       })
+                       .setNegativeButton("NO", null)
+                       .show();
+
+           }
+
+
 
     private void horas_aviarios_dialogs(){
         spinner_hora_inicio.showSpinerDialog();
@@ -527,4 +546,5 @@ public class registro_liberados extends AppCompatActivity {
         });
 
     }
+
 }

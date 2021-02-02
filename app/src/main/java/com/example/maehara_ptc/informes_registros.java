@@ -1,5 +1,6 @@
 package com.example.maehara_ptc;
 
+import Utilidades.contenedor_usuario;
 import Utilidades.voids;
 import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
@@ -26,8 +27,9 @@ public class informes_registros extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.informes_registros);
         txt_calendario=(TextView)findViewById(R.id.txt_calendario_infor);
-
         wv=(WebView)findViewById(R.id.wv);
+        getSupportActionBar().setTitle("INFORMES DE LOTES REGISTRADOS.");
+        getSupportActionBar().setSubtitle("AREA: "+ contenedor_usuario.area+"");
 
     }
 

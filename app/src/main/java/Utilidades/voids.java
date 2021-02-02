@@ -3,12 +3,22 @@ package Utilidades;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
+import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Color;
+import android.graphics.drawable.ClipDrawable;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.GradientDrawable;
+import android.graphics.drawable.LayerDrawable;
+import android.os.AsyncTask;
+import android.os.Handler;
+import android.os.Looper;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.DatePicker;
 import android.widget.Toast;
@@ -17,6 +27,7 @@ import com.example.maehara_ptc.ConexionSQLiteHelper;
 import com.example.maehara_ptc.ConnectionHelperGrupomaehara;
 import com.example.maehara_ptc.MainActivity;
 import com.example.maehara_ptc.R;
+import com.example.maehara_ptc.conexion;
 import com.example.maehara_ptc.informes_registros;
 import com.example.maehara_ptc.menu_principal;
 import com.example.maehara_ptc.registro_liberados;
@@ -37,6 +48,14 @@ import java.util.Calendar;
     public static String mensaje_importador="";
         public static ConexionSQLiteHelper conn;
         public static Connection connect;
+        public static ConnectionHelperGrupomaehara conexion = new ConnectionHelperGrupomaehara();
+        public static  boolean band=false;
+        public static  boolean band_login=false;
+        public static boolean flag = true;
+        public static boolean hilo_sincro=true;
+        public static boolean hilo_exportar=false;
+        public static String mensaje_conexion_menu_principal="";
+        public static int color_conexion_menu_principal=0;
 
         public static void conexion_sqlite(Context context) {
               conn=new ConexionSQLiteHelper(context,"BD_SQLITE_GM",null,3);
@@ -76,7 +95,7 @@ import java.util.Calendar;
             registro_liberados.picker.show();
         }
 
-        public static void exportar(Context context,Integer cod_interno,Integer tipo) {
+        public static void exportar( Integer cod_interno,Integer tipo) {
 
             SQLiteDatabase db=conn.getReadableDatabase();
             ConnectionHelperGrupomaehara conexion = new ConnectionHelperGrupomaehara();
@@ -144,7 +163,11 @@ import java.util.Calendar;
                         String strSQL = "UPDATE lotes SET  estado_registro="+tipo_mensaje+"  WHERE    cod_interno="+cursor.getString(0)+"";
                         db_upd.execSQL(strSQL);
                         db_UPDATE.close();
+
                     }
+                    rs.close();
+                    callableStatement.close();
+                    connect.close();
                 }
 
             }catch(Exception e)
@@ -175,6 +198,7 @@ import java.util.Calendar;
                 lista_exportaciones_fails.add(Exportaciones);
             }
             cursor.close();
+            conn.close();
 
         }
 
@@ -194,6 +218,10 @@ import java.util.Calendar;
                                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                                activity.finish();
                                context.startActivity(intent);
+                               voids.hilo_sincro=true;
+                               final T_pendientes_regist thread = new  T_pendientes_regist();
+                               thread.start();
+
                            }
 
                        })
@@ -218,6 +246,7 @@ import java.util.Calendar;
             registro_liberados.fecha_registro=cursor.getString(0);
           }
         cursor.close();
+            conn.close();
     }
 
         public static void Eliminar_registro(int cod_interno) {
@@ -225,6 +254,7 @@ import java.util.Calendar;
                     SQLiteDatabase db_upd=conn.getReadableDatabase();
                     db_upd.execSQL("UPDATE lotes SET  estado_registro=7  WHERE    cod_interno="+cod_interno+"");
                     db_upd.close();
+                    conn.close();
                 }
             catch(Exception e)
             {
@@ -261,6 +291,8 @@ import java.util.Calendar;
                 }
                 db.close();
                 rs.close();
+                connect.close();
+                conn.close();
                 mensaje_importador="PROCESO FINALIZADO CON EXITO";
             }catch(Exception e){
                 mensaje_importador=e.toString();
@@ -290,6 +322,9 @@ import java.util.Calendar;
                 }
                 db.close();
                 rs.close();
+                conn.close();
+                connect.close();
+
                 mensaje_importador="PROCESO FINALIZADO CON EXITO";
             }catch(Exception e){
                 mensaje_importador=e.toString();
@@ -319,6 +354,8 @@ import java.util.Calendar;
                 }
                 db.close();
                 rs.close();
+                conn.close();
+                connect.close();
                 mensaje_importador="PROCESO FINALIZADO CON EXITO";
             }catch(Exception e){
                 mensaje_importador=e.toString();
@@ -345,6 +382,9 @@ import java.util.Calendar;
                 }
                 db.close();
                 rs.close();
+                conn.close();
+                connect.close();
+
                 mensaje_importador="PROCESO FINALIZADO CON EXITO";
             }catch(Exception e){
                 mensaje_importador=e.toString();
@@ -375,6 +415,7 @@ import java.util.Calendar;
                           "</tr>";
               }
               cursor.close();
+              conn.close();
               String table = "<table border=1> " +
                       "<thead> " +
                       "<tr>" +
@@ -398,6 +439,176 @@ import java.util.Calendar;
 
           }
 
+
+        }
+
+
+        public static void importar_lotes(Context context,int tipo) {
+            try {
+                SQLiteDatabase db_estado= conn.getReadableDatabase();
+                db_estado.execSQL("DELETE FROM lotes_sql ");
+                db_estado.close();
+                SQLiteDatabase db= conn.getReadableDatabase();
+                ConnectionHelperGrupomaehara conexion = new ConnectionHelperGrupomaehara();
+                 connect = conexion.Connections();
+
+                CallableStatement callableStatement=null;
+                callableStatement = connect.prepareCall("{call mae_cch_insertar_lotes_disponibles_app( ?,?)}");
+                callableStatement .setInt("@parametro1",1);
+                callableStatement.registerOutParameter("@mensaje", Types.INTEGER);
+                callableStatement.execute();
+
+                Statement stmt =  connect.createStatement();
+                ResultSet rs = stmt.executeQuery("select *  from  mae_lotes_disponibles_app");
+
+                int c=0;
+
+                while (rs.next())
+                {
+                    ContentValues values=new ContentValues();
+                    values.put("cod_interno",rs.getString("cod_interno"));
+                    values.put("tipo_huevo",rs.getString("tipo_huevo"));
+                    values.put("cod_carrito",rs.getString("cod_carrito"));
+                    values.put("cod_lote",rs.getString("cod_lote"));
+                    values.put("cantidad",rs.getString("cantidad"));
+                    values.put("fecha_puesta",rs.getString("fecha_puesta"));
+                    values.put("estado_liberacion",rs.getString("estado_liberacion"));
+                    values.put("clasificadora",rs.getString("clasificadora"));
+
+                    db.insert("lotes_sql", null,values);
+
+                    if(tipo==2){
+                        c++;
+                        menu_principal.prodialog.setProgress(c);
+                    }
+                }
+
+                db.close();
+                rs.close();
+                 conn.close();
+                connect.close();
+                if(tipo==2){
+                menu_principal.mensaje_importacion="LOTES ACTUALIZADOS CORRECTAMENTE.";
+                }
+            }catch(Exception e){
+                if(tipo==2){
+                menu_principal.mensaje_importacion="NO CUENTA CON CONEXION AL SERVIDOR, ERROR";
+                }
+            }}
+
+        public static void pendientes()
+        {
+            try {
+                SQLiteDatabase db=voids.conn.getReadableDatabase();
+                Cursor cursor=db.rawQuery("SELECT  count(*)  FROM lotes where   estado_registro =1  " ,null);
+                while (cursor.moveToNext())
+                {
+                    menu_principal.total_pendientes=cursor.getInt(0);
+                }
+                cursor.close();
+                conn.close();
+                menu_principal.txt_total_pendientes.setText(String.valueOf(menu_principal.total_pendientes));
+            }catch(Exception e)
+            {
+            }
+        }
+        public static  void test_conexion(){
+            conexion c = new conexion();
+
+            if(c.getConexion()!=null){
+                try {
+
+
+                    pendientes();
+                     mensaje_conexion_menu_principal="EN LINEA";
+                    color_conexion_menu_principal=0xFF00FF00;
+                    System.out.println("EN LINEA");
+
+                }catch(Exception e)
+                {
+                    mensaje_conexion_menu_principal="SIN CONEXION";
+                    color_conexion_menu_principal=0xFFFF0000;
+                }
+
+            }
+            else {
+                pendientes();
+                mensaje_conexion_menu_principal="SIN CONEXION";
+                color_conexion_menu_principal=0xFFFF0000;
+                System.out.println("SIN CONEXION AL SERVER");
+            }
+        }
+
+
+
+        public static  class T_pendientes_regist extends Thread
+        {
+            @Override
+            public void run()
+            {  while (hilo_sincro)
+            {
+                try {
+                    Thread.sleep((long) 3000);
+                     test_conexion();
+                    new Handler(Looper.getMainLooper()).post(new Runnable() {
+                        @Override
+                        public void run() {
+                            menu_principal.txt_estado.setText(mensaje_conexion_menu_principal);
+                            menu_principal.txt_estado.setTextColor(color_conexion_menu_principal);
+                        }
+                    });
+
+                } catch (InterruptedException e) {
+                }
+            }
+          }
+        }
+
+        public static  class T_exportar_regist extends Thread
+        { @Override
+        public void run() {
+            try {
+                exportar(0,1);
+                System.out.println("EL EXPORTADOR  SE EJECUTO");
+                System.out.println("INICIA CONSULTA DE PENDIENTES");
+                new Handler(Looper.getMainLooper()).post(new Runnable() {
+                    @Override
+                    public void run() {
+                        voids.hilo_sincro=true;
+                        final voids.T_pendientes_regist thread = new voids.T_pendientes_regist();
+                        thread.start();
+
+                    }
+                });
+            } catch ( Exception e) {
+                e.printStackTrace();
+            }
+        }
+ }
+
+        public static  class T_exportar_regist_menu_principal extends Thread
+        { @Override
+        public void run() {
+            try {
+                voids.hilo_sincro=false;
+                exportar(0,1);
+                System.out.println("EL EXPORTADOR  SE EJECUTO");
+                System.out.println("INICIA CONSULTA DE PENDIENTES");
+                new Handler(Looper.getMainLooper()).post(new Runnable() {
+                    @Override
+                    public void run() {
+                        voids.hilo_sincro=true;
+                        final voids.T_pendientes_regist thread = new voids.T_pendientes_regist();
+                        thread.start();
+                        menu_principal.progress_export.dismiss();
+
+
+                    }
+                });
+            } catch ( Exception e) {
+                e.printStackTrace();
+            }
+        }
 
         }
     }
