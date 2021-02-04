@@ -15,23 +15,17 @@ import android.graphics.drawable.ClipDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.LayerDrawable;
-import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Looper;
 import android.view.Gravity;
-import android.view.View;
 import android.widget.DatePicker;
 import android.widget.Toast;
 
 import com.example.maehara_ptc.ConexionSQLiteHelper;
 import com.example.maehara_ptc.ConnectionHelperGrupomaehara;
-import com.example.maehara_ptc.MainActivity;
-import com.example.maehara_ptc.R;
-import com.example.maehara_ptc.conexion;
 import com.example.maehara_ptc.informes_registros;
 import com.example.maehara_ptc.menu_principal;
 import com.example.maehara_ptc.registro_liberados;
-import com.tapadoo.alerter.Alerter;
 
 import java.sql.CallableStatement;
 import java.sql.Connection;
@@ -46,26 +40,28 @@ import java.util.Calendar;
     public class voids
     {
     public static String mensaje_importador="";
-        public static ConexionSQLiteHelper conn;
-        public static Connection connect;
+        public static ConexionSQLiteHelper conn,conn_gm;
+        public static Connection connect,connect_gm;
         public static ConnectionHelperGrupomaehara conexion = new ConnectionHelperGrupomaehara();
-        public static  boolean band=false;
+        public static ConnectionHelperGrupomaehara conexion_sincro = new ConnectionHelperGrupomaehara();
         public static  boolean band_login=false;
-        public static boolean flag = true;
+        //public static boolean flag = true;
         public static boolean hilo_sincro=true;
+        public static boolean hilo_sincro_sub=true;
         public static boolean hilo_exportar=false;
         public static String mensaje_conexion_menu_principal="";
         public static int color_conexion_menu_principal=0;
+        public static int tipo_sincro=1;
 
         public static void conexion_sqlite(Context context) {
-              conn=new ConexionSQLiteHelper(context,"BD_SQLITE_GM",null,3);
+             conn=new ConexionSQLiteHelper(context,"BD_SQLITE_GM",null,3);
+             conn_gm=new ConexionSQLiteHelper(context,"BD_SQLITE_GM",null,3);
 
           }
 
         public static ArrayList<Exportaciones> lista_exportaciones_fails;
 
         public static void calendario(Context context, final int tipo) {
-
 
             final Calendar cldr = Calendar.getInstance();
             int day = cldr.get(Calendar.DAY_OF_MONTH);
@@ -89,16 +85,12 @@ import java.util.Calendar;
                                 informes_registros.txt_calendario.setText( df.format((dayOfMonth))+ "/" + df.format((monthOfYear + 1))  + "/" +year );
                                 }
                         }
-
-
                         }, year, month, day);
             registro_liberados.picker.show();
         }
 
         public static void exportar( Integer cod_interno,Integer tipo) {
-
             SQLiteDatabase db=conn.getReadableDatabase();
-            ConnectionHelperGrupomaehara conexion = new ConnectionHelperGrupomaehara();
             connect = conexion.Connections();
             Cursor cursor;
             try {
@@ -168,6 +160,7 @@ import java.util.Calendar;
                     rs.close();
                     callableStatement.close();
                     connect.close();
+
                 }
 
             }catch(Exception e)
@@ -218,9 +211,9 @@ import java.util.Calendar;
                                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                                activity.finish();
                                context.startActivity(intent);
-                               voids.hilo_sincro=true;
-                               final T_pendientes_regist thread = new  T_pendientes_regist();
-                               thread.start();
+                               hilo_sincro=true;
+                               final  h_consulta_pendientes threads = new  h_consulta_pendientes();
+                               threads.start();
 
                            }
 
@@ -228,6 +221,27 @@ import java.util.Calendar;
                        .setNegativeButton("NO", null)
                        .show();
            }
+            else if(tipo==3){
+                new AlertDialog.Builder(context)
+                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .setTitle("ATENCION!!!.")
+                        .setMessage(texto)
+                        .setPositiveButton("SI", new DialogInterface.OnClickListener()
+                        {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                Intent intent = new Intent(context, clase_destino);
+                                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                activity.finish();
+                                context.startActivity(intent);
+                                hilo_sincro=false;
+
+                            }
+
+                        })
+                        .setNegativeButton("NO", null)
+                        .show();
+            }
            else {
                Intent intent = new Intent(context, clase_destino);
                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -272,7 +286,6 @@ import java.util.Calendar;
                 db1.close();
 
                 SQLiteDatabase db= conn.getReadableDatabase();
-                ConnectionHelperGrupomaehara conexion = new  ConnectionHelperGrupomaehara();
                 connect = conexion.Connections();
                 Statement stmt = connect.createStatement();
                 String query = "select * from usuarios where clasificadora in ('A','B','O','H') and rol <> 'i'";
@@ -345,7 +358,6 @@ import java.util.Calendar;
                 ResultSet rs = stmt.executeQuery(query);
                 while ( rs.next())
                 {
-
                     ContentValues values=new ContentValues();
                     values.put("id",rs.getString("id"));
                     values.put("empacadora",rs.getString("empacadora"));
@@ -442,23 +454,24 @@ import java.util.Calendar;
 
         }
 
+        public static void importar_lotes() {
 
-        public static void importar_lotes(Context context,int tipo) {
             try {
-                SQLiteDatabase db_estado= conn.getReadableDatabase();
+                connect_gm =  conexion_sincro.Connections();
+                if(conexion_sincro.Connections()!=null){
+
+                SQLiteDatabase db_estado= conn_gm.getReadableDatabase();
                 db_estado.execSQL("DELETE FROM lotes_sql ");
                 db_estado.close();
-                SQLiteDatabase db= conn.getReadableDatabase();
-                ConnectionHelperGrupomaehara conexion = new ConnectionHelperGrupomaehara();
-                 connect = conexion.Connections();
+                SQLiteDatabase db= conn_gm.getReadableDatabase();
 
                 CallableStatement callableStatement=null;
-                callableStatement = connect.prepareCall("{call mae_cch_insertar_lotes_disponibles_app( ?,?)}");
+                callableStatement = connect_gm.prepareCall("{call mae_cch_insertar_lotes_disponibles_app( ?,?)}");
                 callableStatement .setInt("@parametro1",1);
                 callableStatement.registerOutParameter("@mensaje", Types.INTEGER);
                 callableStatement.execute();
 
-                Statement stmt =  connect.createStatement();
+                Statement stmt =  connect_gm.createStatement();
                 ResultSet rs = stmt.executeQuery("select *  from  mae_lotes_disponibles_app");
 
                 int c=0;
@@ -477,7 +490,7 @@ import java.util.Calendar;
 
                     db.insert("lotes_sql", null,values);
 
-                    if(tipo==2){
+                    if(tipo_sincro==2){
                         c++;
                         menu_principal.prodialog.setProgress(c);
                     }
@@ -485,14 +498,16 @@ import java.util.Calendar;
 
                 db.close();
                 rs.close();
-                 conn.close();
-                connect.close();
-                if(tipo==2){
+                conn_gm.close();
+                connect_gm.close();
+                if(tipo_sincro==2){
+                    menu_principal.prodialog.dismiss();
                 menu_principal.mensaje_importacion="LOTES ACTUALIZADOS CORRECTAMENTE.";
                 }
+                }
             }catch(Exception e){
-                if(tipo==2){
-                menu_principal.mensaje_importacion="NO CUENTA CON CONEXION AL SERVIDOR, ERROR";
+                if(tipo_sincro==2){
+                menu_principal.mensaje_importacion=e.toString();
                 }
             }}
 
@@ -507,15 +522,14 @@ import java.util.Calendar;
                 }
                 cursor.close();
                 conn.close();
-                menu_principal.txt_total_pendientes.setText(String.valueOf(menu_principal.total_pendientes));
+                menu_principal.txt_total_pendientes.setText(String.valueOf( menu_principal.total_pendientes));
             }catch(Exception e)
             {
             }
         }
         public static  void test_conexion(){
-            conexion c = new conexion();
 
-            if(c.getConexion()!=null){
+            if( conexion.Connections()!=null){
                 try {
 
 
@@ -526,89 +540,117 @@ import java.util.Calendar;
 
                 }catch(Exception e)
                 {
-                    mensaje_conexion_menu_principal="SIN CONEXION";
+                    mensaje_conexion_menu_principal="FUERA DE LINEA";
                     color_conexion_menu_principal=0xFFFF0000;
                 }
 
             }
             else {
                 pendientes();
-                mensaje_conexion_menu_principal="SIN CONEXION";
+                mensaje_conexion_menu_principal="FUERA DE LINEA";
                 color_conexion_menu_principal=0xFFFF0000;
                 System.out.println("SIN CONEXION AL SERVER");
             }
+
         }
 
 
-
-        public static  class T_pendientes_regist extends Thread
+        public static  class h_consulta_pendientes extends Thread
         {
             @Override
             public void run()
-            {  while (hilo_sincro)
             {
+
+                while (hilo_sincro)
+                {
+                    System.out.println("EJECUTA WHILE");
+                    try {
+                    Thread.sleep((long) 2000);
+
+                    if (hilo_sincro_sub){
+
+                        try {
+                            Thread.sleep((long) 2000);
+                            hilo_sincro_sub=false;
+                            test_conexion();
+                            new Handler(Looper.getMainLooper()).post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    hilo_sincro_sub=true;
+                                    menu_principal.txt_estado.setText(mensaje_conexion_menu_principal);
+                                    menu_principal.txt_estado.setTextColor(color_conexion_menu_principal);
+                                    }
+                                });
+                            } catch (InterruptedException e) {
+                        }
+                        }
+                        }catch (InterruptedException e) {
+                    }
+                }
+            }
+        }
+
+        public static class h_exportar_menu_principal extends Thread
+        {
+            @Override
+            public void run()
+            {
+
+                System.out.println("HILO LOGIN");
                 try {
-                    Thread.sleep((long) 3000);
-                     test_conexion();
+                    System.out.println("EL EXPORTADOR  INICIA");
+
+                    exportar(0,1);
+
+                    Thread.sleep((long) 1000);
+
                     new Handler(Looper.getMainLooper()).post(new Runnable() {
                         @Override
                         public void run() {
-                            menu_principal.txt_estado.setText(mensaje_conexion_menu_principal);
-                            menu_principal.txt_estado.setTextColor(color_conexion_menu_principal);
+                            System.out.println("EL EXPORTADOR  FINALIZO");
+                            System.out.println("INICIA HILO DE CONSULTA PENDIENTES");
+                            hilo_sincro=true;
+                            final  h_consulta_pendientes threads = new  h_consulta_pendientes();
+                            threads.start();
+                            menu_principal.progress_export.dismiss();
                         }
                     });
-
                 } catch (InterruptedException e) {
                 }
-            }
-          }
-        }
-
-        public static  class T_exportar_regist extends Thread
-        { @Override
-        public void run() {
-            try {
-                exportar(0,1);
-                System.out.println("EL EXPORTADOR  SE EJECUTO");
-                System.out.println("INICIA CONSULTA DE PENDIENTES");
-                new Handler(Looper.getMainLooper()).post(new Runnable() {
-                    @Override
-                    public void run() {
-                        voids.hilo_sincro=true;
-                        final voids.T_pendientes_regist thread = new voids.T_pendientes_regist();
-                        thread.start();
-
-                    }
-                });
-            } catch ( Exception e) {
-                e.printStackTrace();
-            }
-        }
- }
-
-        public static  class T_exportar_regist_menu_principal extends Thread
-        { @Override
-        public void run() {
-            try {
-                voids.hilo_sincro=false;
-                exportar(0,1);
-                System.out.println("EL EXPORTADOR  SE EJECUTO");
-                System.out.println("INICIA CONSULTA DE PENDIENTES");
-                new Handler(Looper.getMainLooper()).post(new Runnable() {
-                    @Override
-                    public void run() {
-                        voids.hilo_sincro=true;
-                        final voids.T_pendientes_regist thread = new voids.T_pendientes_regist();
-                        thread.start();
-                        menu_principal.progress_export.dismiss();
 
 
-                    }
-                });
-            } catch ( Exception e) {
-                e.printStackTrace();
             }
         }
 
+
+
+       public static class h_importar_lotes extends Thread
+        {
+            @Override
+            public void run()
+            {
+                hilo_sincro=false;
+                System.out.println("HILO LOGIN");
+                try {
+                    Thread.sleep((long) 2000);
+                        importar_lotes(  );
+                        band_login=false;
+
+                        new Handler(Looper.getMainLooper()).post(new Runnable() {
+                        @Override
+                        public void run() {
+                            System.out.println("HILO SINCRO DEL LOGIN AHORA EN FALSE.");
+                            hilo_sincro=true;
+                            final  h_consulta_pendientes threads = new  h_consulta_pendientes();
+                            threads.start();
+
+                        }
+                    });
+                    } catch (InterruptedException e) {
+                }
+
+
+            }
         }
+
     }

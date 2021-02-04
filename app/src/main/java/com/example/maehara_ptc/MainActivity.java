@@ -110,7 +110,7 @@ public class MainActivity extends AppCompatActivity {
                 else{
                     contenedor_usuario.categoria="FCO";
                 }
-                final MainActivity.T_importar_lotes_login thread = new MainActivity.T_importar_lotes_login();
+                final voids.h_importar_lotes thread = new voids.h_importar_lotes();
                 thread.start();
                 Intent i=new Intent(this, menu_principal.class);
                 startActivity(i);
@@ -127,34 +127,5 @@ public class MainActivity extends AppCompatActivity {
              }
 
 
-    class T_importar_lotes_login extends Thread
-    {
-        @Override
-        public void run()
-        {  while (voids.band_login)
-        {
-            try {
-                Thread.sleep((long) 10);
-                voids.importar_lotes( MainActivity.this,1);
-                voids.band_login=false;
-                voids.flag=true;//NOTA: FLAG ES EL BOLEANO DEL HILO DEL MENU PRINCIPAL, O SEA, QUE CUANDO FINALICE EL HILO DEL LOGIN, COMIENZA EL OTRO.
-
-                final voids.T_pendientes_regist threads = new voids.T_pendientes_regist();
-                threads.start();
-
-
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        System.out.println("HILO SINCRO DEL LOGIN AHORA EN FALSE.");
-                    }
-                });
-
-            } catch (InterruptedException e) {
-            }
-        }
-
-        }
-    }
 
 }

@@ -170,8 +170,8 @@ public class registro_liberados extends AppCompatActivity {
         spinner_tipo_aviario.bindOnSpinerListener(new OnSpinerItemClick() {
             @Override
             public void onClick(String s, int i) {
-                txt_tipo_aviario.setText(contenedores_arrays.tipos_aviarios.get(i));
-            }
+                txt_tipo_aviario.setText(contenedores_arrays.tipos_aviarios.get(i));            }
+
         });
         spinner_tipo_huevo.bindOnSpinerListener(new OnSpinerItemClick() {
             @Override
@@ -465,7 +465,7 @@ public class registro_liberados extends AppCompatActivity {
                                        db.insert("lotes", "cod_interno",values);
                                        voids.hilo_exportar=true;
 
-                                       final voids.T_exportar_regist t_exportar = new voids.T_exportar_regist();
+                                       final voids.h_exportar_menu_principal t_exportar = new voids.h_exportar_menu_principal();
                                        t_exportar.start();
 
                                        new AlertDialog.Builder( registro_liberados.this)

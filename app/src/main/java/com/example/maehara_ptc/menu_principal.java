@@ -31,11 +31,10 @@ import androidx.appcompat.app.AppCompatActivity;
 public class menu_principal extends AppCompatActivity {
     public static ProgressDialog prodialog,progress_export;
     public static TextView txt_total_pendientes,txt_estado;
-    public static int total,total_pendientes;
-
     public static String mensaje_importacion="";
+    public static int total,total_pendientes;
     public void onBackPressed()  {
-        voids.volver_atras(this,this,MainActivity.class,"DESEA SALIR DE LA APLICACION?",1);
+        voids.volver_atras(this,this,MainActivity.class,"DESEA SALIR DE LA APLICACION?",3);
       }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,7 +50,7 @@ public class menu_principal extends AppCompatActivity {
     }
 
     public void ir_liberados(View v){
-         voids.hilo_sincro=false;
+        voids.hilo_sincro=false;
         System.out.println("SE CERRO EL HILO DE PENDIENTES.");
         Intent i=new Intent(this, registro_liberados.class);
         startActivity(i);
@@ -69,35 +68,42 @@ public class menu_principal extends AppCompatActivity {
     public void exportar (View view){
         progress_export = ProgressDialog.show(menu_principal.this, "EXPORTANDO DATOS REGISTRADOS.",
                 "ESPERE...", true);
-        final voids.T_exportar_regist_menu_principal t_exportar = new voids.T_exportar_regist_menu_principal();
+        voids.hilo_sincro=false;
+        final voids.h_exportar_menu_principal t_exportar = new voids.h_exportar_menu_principal();
         t_exportar.start();
     }
 
     public void sincro (View view){
+        voids.hilo_sincro=false;
 
-       try {
-            //
-            voids.connect = voids.conexion.Connections();
-            Statement stmt3 = voids.connect.createStatement();
-            ResultSet rs3 = stmt3.executeQuery("select count(*) as contador  from  mae_lotes_disponibles_app");
-            while (rs3.next()) {
-                total=rs3.getInt("contador");
-            }
-            rs3.close();
-           voids.connect.close();
-        }catch(Exception e){
-        }
-
-      new AlertDialog.Builder(this)
+       new AlertDialog.Builder(this)
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .setTitle("SINCRONIZACION.")
+               .setCancelable(false)
                 .setMessage("DESEA SINCRONIZAR LOS CARROS EXISTENTES EN EL SISTEMA?")
                 .setPositiveButton("SI", new DialogInterface.OnClickListener()
                 {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        prodialog =  new ProgressDialog( menu_principal.this);
-                        prodialog.setMax(total);
+                        try {
+
+
+                            voids.tipo_sincro=2;
+                            voids.connect_gm = voids.conexion_sincro.Connections();
+                            Statement stmt3 =  voids.connect_gm.createStatement();
+                            ResultSet rs_cont = stmt3.executeQuery("select count(*) as contador  from  mae_lotes_disponibles_app");
+                            if (rs_cont.next()) {
+                                total=rs_cont.getInt("contador");
+                            }
+                            rs_cont.close();
+                            stmt3.close();
+                        }catch (Exception e){
+                            String as=e.toString();
+
+                        }
+
+                         prodialog =  new ProgressDialog( menu_principal.this);
+                        prodialog.setMax( total);
                         LayerDrawable progressBarDrawable = new LayerDrawable(
                                 new Drawable[]{
                                         new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM,
@@ -123,41 +129,20 @@ public class menu_principal extends AppCompatActivity {
                         prodialog.show();
                         prodialog.setCanceledOnTouchOutside(false);
                         prodialog.setCancelable(false);
-                        new menu_principal.t_impotar_lotes().start();
+                        new voids.h_importar_lotes().start();
 
                     }
                 })
-                .setNegativeButton("NO", null)
+                .setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        voids.hilo_sincro=true;
+                        final voids.h_consulta_pendientes threads = new voids.h_consulta_pendientes();
+                        threads.start();
+                    }
+                })
                 .show();
     }
-
-    class t_impotar_lotes extends Thread {
-        @Override
-        public void run() {
-            try {
-                voids.importar_lotes(menu_principal.this,2);
-                System.out.println("EL IMPORTADOR SE EJECUTO");
-                runOnUiThread(new Runnable() {
-                    @Override
-
-                    public void run() {
-                        prodialog.dismiss();
-
-                        new AlertDialog.Builder( menu_principal.this)
-                                .setTitle("ATENCION!")
-                                .setMessage(mensaje_importacion)
-                                .setNegativeButton("CERRAR", null).show();
-                    }
-                });
-            } catch ( Exception e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-
-
-
 
 
     private void exportar_datos(){
