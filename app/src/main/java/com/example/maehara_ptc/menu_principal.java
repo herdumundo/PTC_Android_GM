@@ -66,6 +66,7 @@ public class menu_principal extends AppCompatActivity {
     }
 
     public void exportar (View view){
+        voids.tipo_exportador=1;
         progress_export = ProgressDialog.show(menu_principal.this, "EXPORTANDO DATOS REGISTRADOS.",
                 "ESPERE...", true);
         voids.hilo_sincro=false;

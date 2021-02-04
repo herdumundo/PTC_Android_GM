@@ -463,8 +463,7 @@ public class registro_liberados extends AppCompatActivity {
                                        values.put("codigo_cepillado",codigo_cepillado);
                                        values.put("estado_registro",1);//PENDIENTE
                                        db.insert("lotes", "cod_interno",values);
-                                       voids.hilo_exportar=true;
-
+                                       voids.tipo_exportador=2;
                                        final voids.h_exportar_menu_principal t_exportar = new voids.h_exportar_menu_principal();
                                        t_exportar.start();
 
@@ -474,11 +473,9 @@ public class registro_liberados extends AppCompatActivity {
                                                .setMessage("REGISTRADO CON EXITO")
                                                .setPositiveButton("OK", new DialogInterface.OnClickListener()  {
                                                    public void onClick(DialogInterface dialog, int id) {
-
-                                                       Intent i=new Intent(registro_liberados.this,menu_principal.class);
-                                                       startActivity(i);
-
-                                                       finish();
+                                                    Intent i=new Intent(registro_liberados.this,menu_principal.class);
+                                                    startActivity(i);
+                                                    finish();
                                                    }
                                                }).show();
                                    }

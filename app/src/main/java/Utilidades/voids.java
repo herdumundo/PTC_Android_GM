@@ -48,14 +48,15 @@ import java.util.Calendar;
         //public static boolean flag = true;
         public static boolean hilo_sincro=true;
         public static boolean hilo_sincro_sub=true;
-        public static boolean hilo_exportar=false;
+      //  public static boolean hilo_exportar=false;
         public static String mensaje_conexion_menu_principal="";
         public static int color_conexion_menu_principal=0;
         public static int tipo_sincro=1;
+        public static int tipo_exportador=1;
 
         public static void conexion_sqlite(Context context) {
-             conn=new ConexionSQLiteHelper(context,"BD_SQLITE_GM",null,3);
-             conn_gm=new ConexionSQLiteHelper(context,"BD_SQLITE_GM",null,3);
+             conn=      new ConexionSQLiteHelper(context,"BD_SQLITE_GM",null,3);
+             conn_gm=   new ConexionSQLiteHelper(context,"BD_SQLITE_GM",null,3);
 
           }
 
@@ -159,10 +160,10 @@ import java.util.Calendar;
                     }
                     rs.close();
                     callableStatement.close();
-                    connect.close();
 
+                    pendientes();
                 }
-
+                connect.close();
             }catch(Exception e)
             {
 
@@ -319,7 +320,6 @@ import java.util.Calendar;
                 db1.close();
 
                 SQLiteDatabase db= conn.getReadableDatabase();
-                ConnectionHelperGrupomaehara conexion = new ConnectionHelperGrupomaehara();
                 connect = conexion.Connections();
                 Statement stmt = connect.createStatement();
                 ResultSet rs = stmt.executeQuery("select * from motivo_retencion  ");
@@ -351,7 +351,6 @@ import java.util.Calendar;
                 db1.close();
 
                 SQLiteDatabase db=conn.getReadableDatabase();
-                ConnectionHelperGrupomaehara conexion = new ConnectionHelperGrupomaehara();
                 connect = conexion.Connections();
                 Statement stmt = connect.createStatement();
                 String query = "select * from huevos_empacadoras where estado='A'";
@@ -528,30 +527,25 @@ import java.util.Calendar;
             }
         }
         public static  void test_conexion(){
-
+            try {
             if( conexion.Connections()!=null){
-                try {
 
-
-                    pendientes();
-                     mensaje_conexion_menu_principal="EN LINEA";
-                    color_conexion_menu_principal=0xFF00FF00;
-                    System.out.println("EN LINEA");
-
-                }catch(Exception e)
-                {
-                    mensaje_conexion_menu_principal="FUERA DE LINEA";
-                    color_conexion_menu_principal=0xFFFF0000;
+              // pendientes();
+                mensaje_conexion_menu_principal="EN LINEA";
+                color_conexion_menu_principal=0xFF00FF00;
+                 System.out.println("EN LINEA");
                 }
-
-            }
             else {
-                pendientes();
+                //pendientes();
                 mensaje_conexion_menu_principal="FUERA DE LINEA";
                 color_conexion_menu_principal=0xFFFF0000;
                 System.out.println("SIN CONEXION AL SERVER");
+                }
+            }catch(Exception e)
+            {
+                mensaje_conexion_menu_principal="FUERA DE LINEA";
+                color_conexion_menu_principal=0xFFFF0000;
             }
-
         }
 
 
@@ -563,7 +557,7 @@ import java.util.Calendar;
 
                 while (hilo_sincro)
                 {
-                    System.out.println("EJECUTA WHILE");
+
                     try {
                     Thread.sleep((long) 2000);
 
@@ -572,6 +566,7 @@ import java.util.Calendar;
                         try {
                             Thread.sleep((long) 2000);
                             hilo_sincro_sub=false;
+                            System.out.println("CONSULTA CONEXION");
                             test_conexion();
                             new Handler(Looper.getMainLooper()).post(new Runnable() {
                                 @Override
@@ -612,7 +607,10 @@ import java.util.Calendar;
                             hilo_sincro=true;
                             final  h_consulta_pendientes threads = new  h_consulta_pendientes();
                             threads.start();
-                            menu_principal.progress_export.dismiss();
+                           if(tipo_exportador==1)
+                           {
+                               menu_principal.progress_export.dismiss();
+                           }
                         }
                     });
                 } catch (InterruptedException e) {
@@ -622,15 +620,14 @@ import java.util.Calendar;
             }
         }
 
-
-
-       public static class h_importar_lotes extends Thread
+        public static class h_importar_lotes extends Thread
         {
             @Override
             public void run()
             {
                 hilo_sincro=false;
-                System.out.println("HILO LOGIN");
+                System.out.println("HILO IMPORTADOR EJECUTANDOSE");
+                pendientes();
                 try {
                     Thread.sleep((long) 2000);
                         importar_lotes(  );
@@ -639,7 +636,7 @@ import java.util.Calendar;
                         new Handler(Looper.getMainLooper()).post(new Runnable() {
                         @Override
                         public void run() {
-                            System.out.println("HILO SINCRO DEL LOGIN AHORA EN FALSE.");
+                            System.out.println("FINALIZO EL HILO IMPORTADOR.");
                             hilo_sincro=true;
                             final  h_consulta_pendientes threads = new  h_consulta_pendientes();
                             threads.start();
