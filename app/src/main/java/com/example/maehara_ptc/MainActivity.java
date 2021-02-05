@@ -104,6 +104,7 @@ public class MainActivity extends AppCompatActivity {
                 contenedor_usuario.area=(cursor.getString(1));
                 contenedor_usuario.nombre_usuario=(cursor.getString(2));
                 contenedor_usuario.usuario=(cursor.getString(0));
+                contenedor_usuario.pass=txt_pass.getText().toString().trim();
                 if(cursor.getString(1).equals("O")){
                     contenedor_usuario.categoria="LDO";
                 }

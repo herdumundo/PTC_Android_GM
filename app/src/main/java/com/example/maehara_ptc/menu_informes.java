@@ -30,4 +30,10 @@ public class menu_informes extends AppCompatActivity {
         startActivity(i);
         finish();
     }
+
+    public void ir_informe_eliminar(View v){
+        Intent i=new Intent(this, lista_eliminar.class);
+        startActivity(i);
+        finish();
+    }
 }

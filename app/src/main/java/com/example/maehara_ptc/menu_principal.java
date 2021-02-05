@@ -15,6 +15,7 @@ import android.graphics.drawable.LayerDrawable;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 import java.sql.CallableStatement;
@@ -33,6 +34,7 @@ public class menu_principal extends AppCompatActivity {
     public static TextView txt_total_pendientes,txt_estado;
     public static String mensaje_importacion="";
     public static int total,total_pendientes;
+    public static Button btn_wv;
     public void onBackPressed()  {
         voids.volver_atras(this,this,MainActivity.class,"DESEA SALIR DE LA APLICACION?",3);
       }
@@ -44,6 +46,8 @@ public class menu_principal extends AppCompatActivity {
         getSupportActionBar().setSubtitle("AREA: "+ contenedor_usuario.area);
         txt_total_pendientes=(TextView)findViewById(R.id.txt_total);
         txt_estado=(TextView)findViewById(R.id.txt_estado);
+        btn_wv=(Button)findViewById(R.id.btn_wv);
+        btn_wv.setEnabled(false);
         voids.pendientes();
         voids.conexion_sqlite(this);
 
@@ -65,12 +69,21 @@ public class menu_principal extends AppCompatActivity {
         finish();
     }
 
+
+    public void ir_webView(View v){
+        voids.hilo_sincro=false;
+        voids.verif_wv++;
+        Intent i=new Intent(this, WebView_Lotes.class);
+        startActivity(i);
+        finish();
+    }
+
     public void exportar (View view){
         voids.tipo_exportador=1;
         progress_export = ProgressDialog.show(menu_principal.this, "EXPORTANDO DATOS REGISTRADOS.",
                 "ESPERE...", true);
         voids.hilo_sincro=false;
-        final voids.h_exportar_menu_principal t_exportar = new voids.h_exportar_menu_principal();
+        final voids.h_exportar_lotes t_exportar = new voids.h_exportar_lotes();
         t_exportar.start();
     }
 

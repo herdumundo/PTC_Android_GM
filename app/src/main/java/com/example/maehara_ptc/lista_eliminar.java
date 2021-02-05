@@ -1,5 +1,8 @@
 package com.example.maehara_ptc;
 
+import Utilidades.voids;
+import androidx.appcompat.app.AppCompatActivity;
+
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.graphics.Color;
@@ -11,23 +14,30 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import Utilidades.voids;
-import androidx.appcompat.app.AppCompatActivity;
+public class lista_eliminar extends AppCompatActivity {
+public static  TextView txt_fecha_eliminar;
+public static ListView listView;
+    Button btn_buscar;
 
-
-public class lista_exportaciones_fallidas extends AppCompatActivity {
-   public static ListView listView;
     public void onBackPressed()  {
         voids.volver_atras(this,this,menu_informes.class,"DESEA IR AL MENU DE INFORMES?",2);
     }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.lista_exportaciones_fallidas);
-        listView= (ListView) findViewById(R.id.lv_exportaciones);
+        setContentView(R.layout.lista_eliminar);
+        txt_fecha_eliminar=(TextView)findViewById(R.id.txt_fecha_eliminar);
+        btn_buscar= (Button) findViewById(R.id.btn_buscar);
+        listView= (ListView) findViewById(R.id.lv_eliminar);
 
-        llenar_grilla();
+        btn_buscar.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                voids.llenar_listview_registros(2,lista_eliminar.this);
+            }
+        });
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -41,22 +51,19 @@ public class lista_exportaciones_fallidas extends AppCompatActivity {
                 informacion+="Fecha puesta: "+voids.lista_informes_lotes.get(pos).getFecha_puesta()+"\n";
                 informacion+="Estado: "+voids.lista_informes_lotes.get(pos).getestado()+"\n";
 
-
-                AlertDialog.Builder builder = new AlertDialog.Builder( lista_exportaciones_fallidas.this);
+                AlertDialog.Builder builder = new AlertDialog.Builder( lista_eliminar.this);
                 builder.setMessage(informacion)
-                            .setCancelable(true)
-                        .setPositiveButton("REINTENTAR ENVIO", new DialogInterface.OnClickListener() {
+                        .setCancelable(true)
+                        .setPositiveButton("CANCELAR",null)
+                        .setNegativeButton("ELIMINAR", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
-
-                                AlertDialog.Builder builder_2 = new AlertDialog.Builder(lista_exportaciones_fallidas.this);
-
-                                builder_2.setMessage("ESTA SEGURO QUE DESEA ENVIAR EL REGISTRO?")
+                                AlertDialog.Builder builder_2 = new AlertDialog.Builder(lista_eliminar.this);
+                                builder_2.setMessage("ESTA SEGURO QUE DESEA ELIMINAR EL REGISTRO ?")
                                         .setCancelable(false)
                                         .setPositiveButton("SI", new DialogInterface.OnClickListener() {
                                             public void onClick(DialogInterface dialog, int id) {
-
-                                                voids.exportar( Integer.parseInt(voids.lista_informes_lotes.get(pos).getCod_interno()),2);
-                                                llenar_grilla();
+                                                voids.Eliminar_registro(Integer.parseInt(voids.lista_informes_lotes.get(pos).getCod_interno()));
+                                                voids.llenar_listview_registros(2,lista_eliminar.this);
                                                 dialog.cancel();
                                             }
                                         })
@@ -67,46 +74,15 @@ public class lista_exportaciones_fallidas extends AppCompatActivity {
                                         });
                                 AlertDialog alert_2 = builder_2.create();
                                 alert_2.show();
-
-
                             }
-                        })
-
-                        .setNegativeButton("ELIMINAR", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-
-                        AlertDialog.Builder builder_2 = new AlertDialog.Builder(lista_exportaciones_fallidas.this);
-
-                        builder_2.setMessage("ESTA SEGURO QUE DESEA ELIMINAR EL REGISTRO FALLIDO?")
-                                .setCancelable(false)
-                                .setPositiveButton("SI", new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int id) {
-
-                                        //  eliminar_aviarios.eliminar_aviario_pendiente(lista_recogidas.this,id_registro);
-                                        voids.Eliminar_registro(Integer.parseInt(voids.lista_informes_lotes.get(pos).getCod_interno()));
-                                        llenar_grilla();
-                                        dialog.cancel();
-                                    }
-                                })
-                                .setNegativeButton("CANCELAR", new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int id) {
-                                        dialog.cancel();
-                                    }
-                                });
-                        AlertDialog alert_2 = builder_2.create();
-                        alert_2.show();
-
-
-                    }
-                });
-                 AlertDialog alert = builder.create();
+                        });
+                AlertDialog alert = builder.create();
                 alert.show();
             }
         });
     }
 
-    private void llenar_grilla(){
-        voids.llenar_listview_registros(1,lista_exportaciones_fallidas.this);
-
+    public void fecha(View v){
+        voids.calendario(this,4);
     }
 }

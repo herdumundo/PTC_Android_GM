@@ -31,14 +31,15 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 public class registro_liberados extends AppCompatActivity {
-    private static final int CODIGO_PERMISOS_CAMARA = 1, CODIGO_INTENT = 2;
-    private boolean permisoCamaraConcedido = false, permisoSolicitadoDesdeBoton = false;
-    public static SpinnerDialog spinner_tipo_maples,    spinner_tipo_huevo,     spinner_u_medida,
-                                spinner_hora_inicio,    spinner_hora_fin,       spinner_tipo_aviario,spinner_cantidades;
+    private static final int CODIGO_PERMISOS_CAMARA = 1,    CODIGO_INTENT = 2;
+    private boolean permisoCamaraConcedido = false,
+                    permisoSolicitadoDesdeBoton = false;
+    public static SpinnerDialog spinner_tipo_maples,        spinner_tipo_huevo,                     spinner_u_medida,
+                                spinner_hora_inicio,        spinner_hora_fin,                       spinner_tipo_aviario,spinner_cantidades;
 
-    public static TextView  txt_fecha_clasificacion,txt_fecha_puesta,           txt_tipo_maples,    txt_tipo_huevo,
-                            txt_u_medida,           txt_carro,                  txt_hora_inicio,    txt_hora_fin,
-                            txt_tipo_aviario,       txt_responsable,            txt_cantidad,       txt_liberado_por,
+    public static TextView  txt_fecha_clasificacion,        txt_fecha_puesta,           txt_tipo_maples,    txt_tipo_huevo,
+                            txt_u_medida,                   txt_carro,                  txt_hora_inicio,    txt_hora_fin,
+                            txt_tipo_aviario,               txt_responsable,            txt_cantidad,       txt_liberado_por,
                             txt_comentario;
     Button btn_fecha_puesta,btn_fecha_clasificacion,btnEscanear ;
     public static DatePickerDialog picker;
@@ -339,7 +340,7 @@ public class registro_liberados extends AppCompatActivity {
                                    {
                                        cantidad_existente=cursor.getInt(0);
                                    }
-
+                                   db_consulta.close();
 
                                    if ((cantidad_existente+cantidad_val)>12)
                                    {
@@ -464,7 +465,7 @@ public class registro_liberados extends AppCompatActivity {
                                        values.put("estado_registro",1);//PENDIENTE
                                        db.insert("lotes", "cod_interno",values);
                                        voids.tipo_exportador=2;
-                                       final voids.h_exportar_menu_principal t_exportar = new voids.h_exportar_menu_principal();
+                                       final voids.h_exportar_lotes t_exportar = new voids.h_exportar_lotes();
                                        t_exportar.start();
 
                                        new AlertDialog.Builder( registro_liberados.this)

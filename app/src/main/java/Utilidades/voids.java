@@ -3,7 +3,6 @@ package Utilidades;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
-import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -11,22 +10,22 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
-import android.graphics.drawable.ClipDrawable;
 import android.graphics.drawable.Drawable;
-import android.graphics.drawable.GradientDrawable;
-import android.graphics.drawable.LayerDrawable;
 import android.os.Handler;
 import android.os.Looper;
-import android.view.Gravity;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.DatePicker;
-import android.widget.Toast;
-
+import android.widget.TextView;
 import com.example.maehara_ptc.ConexionSQLiteHelper;
 import com.example.maehara_ptc.ConnectionHelperGrupomaehara;
+import com.example.maehara_ptc.R;
 import com.example.maehara_ptc.informes_registros;
 import com.example.maehara_ptc.menu_principal;
 import com.example.maehara_ptc.registro_liberados;
-
+import com.example.maehara_ptc.lista_eliminar;
+import com.example.maehara_ptc.lista_exportaciones_fallidas;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -39,28 +38,19 @@ import java.util.Calendar;
 
     public class voids
     {
-    public static String mensaje_importador="";
-        public static ConexionSQLiteHelper conn,conn_gm;
-        public static Connection connect,connect_gm;
-        public static ConnectionHelperGrupomaehara conexion = new ConnectionHelperGrupomaehara();
-        public static ConnectionHelperGrupomaehara conexion_sincro = new ConnectionHelperGrupomaehara();
-        public static  boolean band_login=false;
-        //public static boolean flag = true;
-        public static boolean hilo_sincro=true;
-        public static boolean hilo_sincro_sub=true;
-      //  public static boolean hilo_exportar=false;
-        public static String mensaje_conexion_menu_principal="";
-        public static int color_conexion_menu_principal=0;
-        public static int tipo_sincro=1;
-        public static int tipo_exportador=1;
+        public static String    mensaje_importador="",  descripcion="", mensaje_conexion_menu_principal="";
+        public static int       verif_wv=0, color_conexion_menu_principal=0,    tipo_sincro=1,  tipo_exportador=1, habilitar_boton_web=1;
+        public static  boolean  band_login=false,   hilo_sincro=true,   hilo_sincro_sub=true;
+        public static ConexionSQLiteHelper  conn,   conn_gm;
+        public static Connection            connect,connect_gm;
+        public static ConnectionHelperGrupomaehara  conexion = new ConnectionHelperGrupomaehara();
+        public static ConnectionHelperGrupomaehara  conexion_sincro = new ConnectionHelperGrupomaehara();
+        public static ArrayList<Exportaciones>      lista_informes_lotes;
 
         public static void conexion_sqlite(Context context) {
              conn=      new ConexionSQLiteHelper(context,"BD_SQLITE_GM",null,3);
              conn_gm=   new ConexionSQLiteHelper(context,"BD_SQLITE_GM",null,3);
-
-          }
-
-        public static ArrayList<Exportaciones> lista_exportaciones_fails;
+            }
 
         public static void calendario(Context context, final int tipo) {
 
@@ -84,7 +74,10 @@ import java.util.Calendar;
                             }
                             else if(tipo==3){
                                 informes_registros.txt_calendario.setText( df.format((dayOfMonth))+ "/" + df.format((monthOfYear + 1))  + "/" +year );
-                                }
+                            }
+                            else if(tipo==4){
+                                lista_eliminar.txt_fecha_eliminar.setText( df.format((dayOfMonth))+ "/" + df.format((monthOfYear + 1))  + "/" +year );
+                            }
                         }
                         }, year, month, day);
             registro_liberados.picker.show();
@@ -171,13 +164,23 @@ import java.util.Calendar;
              }
         }
 
-        public static void consultarListaexportaciones_fallidas(Context context) {
-             SQLiteDatabase db=conn.getReadableDatabase();
-            Exportaciones Exportaciones=null;
+        public static void llenar_listview_registros(int tipo,Context context) {
 
-             lista_exportaciones_fails=new ArrayList<Exportaciones>();
+            String query=null;
+                SQLiteDatabase db=conn.getReadableDatabase();
+                Exportaciones Exportaciones=null;
+                lista_informes_lotes=new ArrayList<Exportaciones>();
+                if(tipo==1){//1= EXPORTACIONES FALLIDAS
+                    query="select  a.cod_carrito,b.descripcion,a.cod_interno,a.fecha_puesta,a.fecha,a.cantidad,a.tipo_huevo from lotes a inner join estados_registros b on a.estado_registro=b.id  where a.estado_registro not in(1,2)";
+                    descripcion="DESCRIPCION DEL ERROR: ";
+                }
+                else  if(tipo==2) { //2= ELIMINACION DE REGISTROS
+                    String fecha=lista_eliminar.txt_fecha_eliminar.getText().toString().trim();
+                    query="select  a.cod_carrito,b.descripcion,a.cod_interno,a.fecha_puesta,a.fecha,a.cantidad,a.tipo_huevo from lotes a inner join estados_registros b on a.estado_registro=b.id  where a.estado_registro=1 and fecha='"+fecha+"'  ";
+                    descripcion="ESTADO: ";
 
-            Cursor cursor=db.rawQuery("select  a.cod_carrito,b.descripcion,a.cod_interno,a.fecha_puesta,a.fecha,a.cantidad,a.tipo_huevo from lotes a inner join estados_registros b on a.estado_registro=b.id  where a.estado_registro not in(1,2)"   ,null);
+                }
+                Cursor cursor=db.rawQuery(query  ,null);
 
             while (cursor.moveToNext()){
 
@@ -189,16 +192,33 @@ import java.util.Calendar;
                 Exportaciones.setFecha_clasificacion(cursor.getString(4));
                 Exportaciones.setCantidad(cursor.getString(5));
                 Exportaciones.setTipo_huevo(cursor.getString(6));
-                lista_exportaciones_fails.add(Exportaciones);
+                lista_informes_lotes.add(Exportaciones);
             }
             cursor.close();
             conn.close();
 
+            ArrayAdapter adapter = new ArrayAdapter(context, R.menu.simple_list_item_2, R.id.text1, lista_informes_lotes) {
+                @Override
+                public View getView(int position, View convertView, ViewGroup parent) {
+                    View view = super.getView(position, convertView, parent);
+                    TextView text1 = (TextView) view.findViewById(R.id.text1);
+                    TextView text2 = (TextView) view.findViewById(R.id.text2);
+
+                    text1.setText("CARRO NRO.: "+ lista_informes_lotes.get(position).getcod_carrito());
+                    text2.setText(descripcion+ lista_informes_lotes.get(position).getestado());
+                    view.setBackgroundColor(Color.RED);
+                    return view;
+                }
+            };
+            if(tipo==1){
+                lista_exportaciones_fallidas.listView.setAdapter(adapter);
+            }
+            else{
+                lista_eliminar.listView.setAdapter(adapter);
+             }
         }
 
         public static void volver_atras(Context context, Activity activity,Class clase_destino,String texto,int tipo)  {
-
-
            if(tipo==1){
                new AlertDialog.Builder(context)
                        .setIcon(android.R.drawable.ic_dialog_alert)
@@ -215,34 +235,31 @@ import java.util.Calendar;
                                hilo_sincro=true;
                                final  h_consulta_pendientes threads = new  h_consulta_pendientes();
                                threads.start();
-
                            }
-
                        })
                        .setNegativeButton("NO", null)
                        .show();
            }
-            else if(tipo==3){
-                new AlertDialog.Builder(context)
-                        .setIcon(android.R.drawable.ic_dialog_alert)
-                        .setTitle("ATENCION!!!.")
-                        .setMessage(texto)
-                        .setPositiveButton("SI", new DialogInterface.OnClickListener()
-                        {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                Intent intent = new Intent(context, clase_destino);
-                                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                                activity.finish();
-                                context.startActivity(intent);
-                                hilo_sincro=false;
+           else if(tipo==3){
+               new AlertDialog.Builder(context)
+                       .setIcon(android.R.drawable.ic_dialog_alert)
+                       .setTitle("ATENCION!!!.")
+                       .setMessage(texto)
+                       .setPositiveButton("SI", new DialogInterface.OnClickListener()
+                       {
+                           @Override
+                           public void onClick(DialogInterface dialog, int which) {
+                               Intent intent = new Intent(context, clase_destino);
+                               intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                               activity.finish();
+                               context.startActivity(intent);
+                               hilo_sincro=false;
+                           }
+                       })
+                       .setNegativeButton("NO", null)
+                       .show();
+           }
 
-                            }
-
-                        })
-                        .setNegativeButton("NO", null)
-                        .show();
-            }
            else {
                Intent intent = new Intent(context, clase_destino);
                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -262,7 +279,7 @@ import java.util.Calendar;
           }
         cursor.close();
             conn.close();
-    }
+        }
 
         public static void Eliminar_registro(int cod_interno) {
             try {
@@ -312,7 +329,6 @@ import java.util.Calendar;
                 mensaje_importador=e.toString();
             }}
 
-
         public static void sincronizar_motivo_retencion() {
             try {
                 SQLiteDatabase db1= conn.getReadableDatabase();
@@ -342,7 +358,6 @@ import java.util.Calendar;
             }catch(Exception e){
                 mensaje_importador=e.toString();
             }}
-
 
         public static void sincronizar_empacadoras() {
             try {
@@ -510,10 +525,9 @@ import java.util.Calendar;
                 }
             }}
 
-        public static void pendientes()
-        {
+        public static void pendientes() {
             try {
-                SQLiteDatabase db=voids.conn.getReadableDatabase();
+                SQLiteDatabase db=conn.getReadableDatabase();
                 Cursor cursor=db.rawQuery("SELECT  count(*)  FROM lotes where   estado_registro =1  " ,null);
                 while (cursor.moveToNext())
                 {
@@ -522,48 +536,40 @@ import java.util.Calendar;
                 cursor.close();
                 conn.close();
                 menu_principal.txt_total_pendientes.setText(String.valueOf( menu_principal.total_pendientes));
+
             }catch(Exception e)
             {
             }
         }
-        public static  void test_conexion(){
+
+        public static void test_conexion(){
             try {
             if( conexion.Connections()!=null){
-
-              // pendientes();
-                mensaje_conexion_menu_principal="EN LINEA";
-                color_conexion_menu_principal=0xFF00FF00;
-                 System.out.println("EN LINEA");
+                habilitar_boton_web=1;
+                System.out.println("EN LINEA");
                 }
             else {
-                //pendientes();
-                mensaje_conexion_menu_principal="FUERA DE LINEA";
-                color_conexion_menu_principal=0xFFFF0000;
+                habilitar_boton_web=2;
                 System.out.println("SIN CONEXION AL SERVER");
                 }
             }catch(Exception e)
             {
-                mensaje_conexion_menu_principal="FUERA DE LINEA";
-                color_conexion_menu_principal=0xFFFF0000;
+                habilitar_boton_web=2;
+                System.out.println(e.toString());
             }
         }
 
-
-        public static  class h_consulta_pendientes extends Thread
-        {
+        public static class h_consulta_pendientes   extends Thread {
             @Override
             public void run()
             {
-
                 while (hilo_sincro)
                 {
-
                     try {
                     Thread.sleep((long) 2000);
-
                     if (hilo_sincro_sub){
-
                         try {
+                            pendientes();
                             Thread.sleep((long) 2000);
                             hilo_sincro_sub=false;
                             System.out.println("CONSULTA CONEXION");
@@ -571,9 +577,26 @@ import java.util.Calendar;
                             new Handler(Looper.getMainLooper()).post(new Runnable() {
                                 @Override
                                 public void run() {
+                                    if(habilitar_boton_web==1){
+                                        menu_principal.btn_wv.setEnabled(true);
+                                        menu_principal.btn_wv.setTextColor(Color.GREEN);
+                                        menu_principal.btn_wv.setBackgroundResource(R.drawable.botonverde);
+
+                                        menu_principal.btn_wv.setText("APLICACION ONLINE DISPONIBLE");
+                                        menu_principal.txt_estado.setText("EN LINEA");
+                                        menu_principal.txt_estado.setTextColor(Color.GREEN);
+
+                                    }
+                                    else {
+                                        menu_principal.btn_wv.setEnabled(false);
+                                        menu_principal.btn_wv.setTextColor(Color.RED);
+                                        menu_principal.btn_wv.setBackgroundResource(R.drawable.boton_rojo);
+                                        menu_principal.btn_wv.setText("APLICACION ONLINE NO DISPONIBLE");
+                                        menu_principal.txt_estado.setText("FUERA DE LINEA");
+                                        menu_principal.txt_estado.setTextColor(Color.RED);
+                                        }
                                     hilo_sincro_sub=true;
-                                    menu_principal.txt_estado.setText(mensaje_conexion_menu_principal);
-                                    menu_principal.txt_estado.setTextColor(color_conexion_menu_principal);
+
                                     }
                                 });
                             } catch (InterruptedException e) {
@@ -585,8 +608,7 @@ import java.util.Calendar;
             }
         }
 
-        public static class h_exportar_menu_principal extends Thread
-        {
+        public static class h_exportar_lotes        extends Thread {
             @Override
             public void run()
             {
@@ -604,8 +626,8 @@ import java.util.Calendar;
                         public void run() {
                             System.out.println("EL EXPORTADOR  FINALIZO");
                             System.out.println("INICIA HILO DE CONSULTA PENDIENTES");
-                            hilo_sincro=true;
-                            final  h_consulta_pendientes threads = new  h_consulta_pendientes();
+
+                            final  h_importar_lotes threads = new  h_importar_lotes();
                             threads.start();
                            if(tipo_exportador==1)
                            {
@@ -620,14 +642,13 @@ import java.util.Calendar;
             }
         }
 
-        public static class h_importar_lotes extends Thread
-        {
+        public static class h_importar_lotes        extends Thread {
             @Override
             public void run()
             {
                 hilo_sincro=false;
                 System.out.println("HILO IMPORTADOR EJECUTANDOSE");
-                pendientes();
+
                 try {
                     Thread.sleep((long) 2000);
                         importar_lotes(  );

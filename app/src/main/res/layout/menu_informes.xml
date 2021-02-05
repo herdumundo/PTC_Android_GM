@@ -37,4 +37,20 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/btn_desm"
         tools:ignore="MissingConstraints" />
+
+    <Button
+        android:id="@+id/btn_eliminar"
+        android:layout_width="379dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/btn_ir_liberados"
+        android:layout_centerInParent="true"
+        android:layout_marginTop="44dp"
+        android:background="@drawable/boton_negro"
+        android:drawableLeft="@mipmap/ic_eliminar"
+        android:onClick="ir_informe_eliminar"
+        android:text="Eliminacion de registros no exportados."
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btn_desm4"
+        tools:ignore="MissingConstraints" />
 </androidx.constraintlayout.widget.ConstraintLayout>
